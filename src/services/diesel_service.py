@@ -37,8 +37,11 @@ def get_diesel_data(ne_name: str):
         if diesel_row.empty:
             raise DieselDataError(f"END_ID '{end_id}' não encontrado na aba 'Controle Diesel'.")
 
-        litros = diesel_row.iloc[0]['VOLUME EXISTENTE ATUAL\n (Litros)']
-        horas = diesel_row.iloc[0]['AUTONOMIA COM O VOLUME ATUAL\n (horas)']
+        litros_val = diesel_row.iloc[0]['VOLUME EXISTENTE ATUAL\n (Litros)']
+        horas_val = diesel_row.iloc[0]['AUTONOMIA COM O VOLUME ATUAL\n (horas)']
+        
+        litros = int(litros_val) if float(litros_val).is_integer() else float(litros_val)
+        horas = int(horas_val) if float(horas_val).is_integer() else float(horas_val)
 
         return {'litros': litros, 'horas': horas}
 

@@ -2,9 +2,9 @@ import pandas as pd
 import requests
 import os
 
-from dotenv import load_dotenv
+from utils.resource import loadEnvFile
 
-load_dotenv()
+loadEnvFile()
 
 class DieselDataError(Exception):    
     pass

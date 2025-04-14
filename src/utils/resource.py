@@ -1,5 +1,6 @@
 import sys
 import os
+from dotenv import load_dotenv
 
 def internalPath(relative_path):  
     if hasattr(sys, '_MEIPASS'):
@@ -12,3 +13,8 @@ def externalPath(relative_path):
     else:
         base_path = os.path.dirname(os.path.abspath(sys.argv[0]))
     return os.path.join(base_path, relative_path)
+
+def loadEnvFile():
+    dotenv_path = internalPath(".env")
+    if os.path.exists(dotenv_path):
+        load_dotenv(dotenv_path)

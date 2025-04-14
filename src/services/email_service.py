@@ -6,9 +6,9 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from utils.resource import internalPath
 
-from dotenv import load_dotenv
+from utils.resource import loadEnvFile
 
-load_dotenv()
+loadEnvFile()
 
 def send_mail(email_data): 
         

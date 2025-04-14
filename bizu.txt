@@ -1,0 +1,15 @@
+#Para compilar o script com o pyinstaller
+#python -m PyInstaller main.py  
+python -m PyInstaller --onefile main.py  
+
+
+#criar venv
+python -m venv .venvlenovo
+
+#gmail dos operadores
+gomes.rsouza@gmail.com
+diogofrancof89@gmail.com
+renato241076@gmail.com
+mm.borillo7@gmail.com
+marcos.jown@outlook.com
+erickdos4@gmail.com

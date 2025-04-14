@@ -1,0 +1,27 @@
+QWidget#sidebar {
+  background-color: #2b3e50;
+  color: #ffffff;
+}
+
+QPushButton {
+  background: #2b3e50;
+  border: none;
+  padding: 10px 15px;
+  text-align: left;
+  color: #ffffff;
+  font-size: 14px;
+}
+
+QPushButton:hover {
+  background-color: #0d5c4c;
+}
+
+QPushButton:checked {
+  background-color: #16a085;  
+  font-weight: bold;
+}
+
+QPushButton:pressed {
+  background-color: #1cc1a0;
+}
+

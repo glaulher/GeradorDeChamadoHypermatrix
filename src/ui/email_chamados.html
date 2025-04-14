@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+ 
+<head>
+    <style>
+        body {
+              width:1236px
+        }
+ 
+        .container {
+            color: rgb(75, 75, 75);
+            padding-bottom: 10px;
+            padding-left: 5px;
+        }
+    </style>
+</head>
+ 
+<body>
+    <div class="container">
+        <header>
+            <h1>{{ subject }}</h1> 
+        </header>
+ 
+        <main>
+            <div>
+            <p>{{ greeting }}</p>
+            <p>{{ message }}</p>
+
+
+            </div>
+            <div></div>
+            <p><nobr>{{ message_body }}</nobr></p>
+
+            <h1>{{ table_title }}</h1>
+            </div>
+            
+            <div class="container">
+
+                {% for key in payload: %}
+                <b>{{ key }}</b> : {{ payload[key] }} <br>
+                {% endfor %}
+            </div>
+            <!--<p>Att, <br>{{ sender_name }}</p>-->
+
+            
+        </main>
+ 
+        <footer>
+            ...
+        </footer>
+    </div>
+</body>
+ 
+</html>

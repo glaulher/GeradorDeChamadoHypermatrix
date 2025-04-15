@@ -1,4 +1,6 @@
 from PyQt5.QtWidgets import *
+from PyQt5.QtCore import Qt,QStringListModel
+
 import datetime
 import json
 import pyperclip
@@ -34,7 +36,23 @@ class WindowControlePIM(QDialog):
         self.sala_de_crise_ComboBox  = QComboBox()
         self.desservico_ComboBox = QComboBox()
         self.ownertim_acionado_ComboBox = QComboBox()
+        
         self.nome_owner_ComboBox = QComboBox()
+        self.nome_owner_ComboBox.setEditable(True)
+        self.nome_owner_ComboBox.setInsertPolicy(QComboBox.NoInsert)
+        
+        nome_owner_list = sorted(set([item.strip() for item in combobox_options['nome_owner']]))
+        nome_owner_model = QStringListModel(nome_owner_list)
+
+        self.nome_owner_ComboBox.addItems(nome_owner_list)
+
+        completer = QCompleter()
+        completer.setModel(nome_owner_model)
+        completer.setCompletionMode(QCompleter.PopupCompletion)
+        completer.setFilterMode(Qt.MatchContains)
+        completer.setCaseSensitivity(Qt.CaseInsensitive)
+
+        self.nome_owner_ComboBox.setCompleter(completer)
 
         self.operador_ComboBox.addItems(combobox_options['operador'])
         self.tipo_de_alarme_ComboBox.addItems(combobox_options['tipo_de_alarme'])
@@ -45,7 +63,7 @@ class WindowControlePIM(QDialog):
         self.sala_de_crise_ComboBox.addItems(combobox_options['sala_de_crise'])
         self.desservico_ComboBox.addItems(combobox_options['desservico'])
         self.ownertim_acionado_ComboBox.addItems(combobox_options['ownertim_acionado'])
-        self.nome_owner_ComboBox.addItems(combobox_options['nome_owner'])
+        
 
         self.createForm()
         self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok)

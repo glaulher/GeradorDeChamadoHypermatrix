@@ -1,18 +1,19 @@
 from PyQt5.QtWidgets import *
+from PyQt5.QtCore import Qt,QStringListModel
+
 import datetime
 import json
-import pyperclip
 from services.lookup_service import fetch_datalookup
 from services.email_service import send_mail
 from utils.resource import externalPath
-from utils.strings import sanitize_string
 from utils.datetime_utils import get_greeting
+from utils.payload_utils import gerar_payload_e_output
 
 from ui.widgets.spell_check_plain_text_edit import SpellCheckPlainTextEdit
 from ui.widgets.uppercase_line_edit import UpperCaseLineEdit
-
-with open(externalPath('data/combobox_options.json'), 'r',encoding='utf-8') as file:
-    combobox_options = json.load(file)
+from ui.widgets.operator_combobox import OperatorComboBox
+from ui.widgets.hour_widget import HourWidget
+from ui.widgets.combobox_options import load_combobox_options
 
 class WindowDSOC(QDialog):
     def __init__(self):
@@ -20,19 +21,19 @@ class WindowDSOC(QDialog):
         self.setWindowTitle("Gerador de chamados DSOC")
 
         self.formGroupBox = QGroupBox("Chamados DSOC")
-        self.operador_ComboBox = QComboBox()
-        self.horario_LineEdit = QLineEdit()
-        self.horario_LineEdit.setText(datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S"))
+        
+        self.operador_ComboBox = OperatorComboBox()        
+        self.hourWidget = HourWidget()
+        
         self.motivacao_ComboBox = QComboBox()
         self.tipo_de_alarme_ComboBox = QComboBox()
         self.gravidade_ComboBox = QComboBox()
         self.ne_name_LineEdit = UpperCaseLineEdit()
-        self.causa_PlainText = SpellCheckPlainTextEdit()
-
-        self.operador_ComboBox.addItems(combobox_options['operador'])
-        self.motivacao_ComboBox.addItems(combobox_options['motivacao'])
-        self.tipo_de_alarme_ComboBox.addItems(combobox_options['tipo_de_alarme'])
-        self.gravidade_ComboBox.addItems(combobox_options['gravidade'])
+        self.causa_PlainText = SpellCheckPlainTextEdit()        
+        
+        load_combobox_options(self.motivacao_ComboBox, 'motivacao')
+        load_combobox_options(self.tipo_de_alarme_ComboBox, 'tipo_de_alarme')
+        load_combobox_options(self.gravidade_ComboBox, 'gravidade')
 
         self.createForm()
         self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok)
@@ -42,7 +43,7 @@ class WindowDSOC(QDialog):
         subLayout.addWidget(self.formGroupBox)
         subLayout.addWidget(self.buttonBox)
         self.setLayout(subLayout)
-
+    
     def getInfo(self):
         ne_name = self.ne_name_LineEdit.text()
         if fetch_datalookup('NE_NAME', ne_name, 'CLASSIFICAÇÃO') is None:
@@ -58,7 +59,7 @@ class WindowDSOC(QDialog):
         payload = {
             'Assunto': "Prezados! Solicitamos a abertura de chamado para o prédio industrial abaixo:",
             'Operador': self.operador_ComboBox.currentText(),
-            'Horário': self.horario_LineEdit.text(),
+            'Horário': self.hourWidget.text(),
             'Motivação': fetch_datalookup('END_ID', end_id, 'SUBCLASS'),
             'Alarme': self.tipo_de_alarme_ComboBox.currentText(),
             'Gravidade': self.gravidade_ComboBox.currentText(),
@@ -70,19 +71,7 @@ class WindowDSOC(QDialog):
             'Causa': self.causa_PlainText.toPlainText()
         }
 
-        for k in payload:
-            payload[k] = sanitize_string(payload[k])
-
-        with open('payload.json', 'w', encoding='utf-8') as f:
-            json.dump(payload, f, ensure_ascii=False, indent=4)
-
-        output_str = ''
-        for key in payload:
-            if key == 'Assunto':
-                output_str +=f"*{payload[key]}*\n\n"
-            else:
-                output_str +=f"*{key}*: {payload[key]}\n"
-        pyperclip.copy(output_str)
+        output_str = gerar_payload_e_output(payload)
 
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Information)
@@ -120,7 +109,9 @@ class WindowDSOC(QDialog):
     def createForm(self):
         layout = QFormLayout()
         layout.addRow("Operador", self.operador_ComboBox)
-        layout.addRow("Horário", self.horario_LineEdit)
+        
+        layout.addRow("Horário", self.hourWidget)
+                
         layout.addRow("Motivação", self.motivacao_ComboBox)
         layout.addRow("Tipo de Alarme", self.tipo_de_alarme_ComboBox)
         layout.addRow("Gravidade", self.gravidade_ComboBox)

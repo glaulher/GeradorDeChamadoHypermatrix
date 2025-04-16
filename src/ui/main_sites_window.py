@@ -1,18 +1,19 @@
 from PyQt5.QtWidgets import *
+from PyQt5.QtCore import Qt,QStringListModel
+
 import datetime
 import json
-import pyperclip
 from services.lookup_service import fetch_datalookup
 from services.email_service import send_mail
 from utils.resource import externalPath
-from utils.strings import sanitize_string
 from utils.datetime_utils import get_greeting
+from utils.payload_utils import gerar_payload_e_output
 
 from ui.widgets.spell_check_plain_text_edit import SpellCheckPlainTextEdit
 from ui.widgets.uppercase_line_edit import UpperCaseLineEdit
-
-with open(externalPath('data/combobox_options.json'), 'r', encoding='utf-8') as file:
-    combobox_options = json.load(file)
+from ui.widgets.operator_combobox import OperatorComboBox
+from ui.widgets.hour_widget import HourWidget
+from ui.widgets.combobox_options import load_combobox_options
 
 class WindowMS(QDialog):
     def __init__(self):
@@ -20,15 +21,16 @@ class WindowMS(QDialog):
         self.setWindowTitle("Gerador de chamados MAIN SITES")
 
         self.formGroupBox = QGroupBox("Chamados MAIN SITES")
-        self.operador_ComboBox = QComboBox()
-        self.horario_LineEdit = QLineEdit(datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S"))
+        
+        self.operador_ComboBox = OperatorComboBox()
+        self.hourWidget = HourWidget()
+        
         self.end_id_LineEdit = UpperCaseLineEdit()
         self.tipo_de_alarme_ComboBox = QComboBox()
         self.tskeve_LineEdit = UpperCaseLineEdit()
-        self.atualizacao_PlainText = SpellCheckPlainTextEdit()
-
-        self.operador_ComboBox.addItems(combobox_options['operador'])
-        self.tipo_de_alarme_ComboBox.addItems(combobox_options['tipo_de_alarme'])
+        self.atualizacao_PlainText = SpellCheckPlainTextEdit()        
+        
+        load_combobox_options(self.tipo_de_alarme_ComboBox, 'tipo_de_alarme')
 
         self.createForm()
         self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok)
@@ -37,7 +39,7 @@ class WindowMS(QDialog):
         subLayout = QVBoxLayout()
         subLayout.addWidget(self.formGroupBox)
         subLayout.addWidget(self.buttonBox)
-        self.setLayout(subLayout)
+        self.setLayout(subLayout)    
 
     def getInfo(self):
         end_id = self.end_id_LineEdit.text()
@@ -68,20 +70,7 @@ class WindowMS(QDialog):
             'Atualização':"{0}".format(self.atualizacao_PlainText.toPlainText())
         }
 
-        for k in payload:
-            payload[k] = sanitize_string(payload[k])
-
-        with open('payload.json', 'w', encoding='utf-8') as f:
-            json.dump(payload, f, ensure_ascii=False, indent=4)
-
-        output_str = ''
-        for key in payload:
-            if key == 'Assunto':
-                output_str +=f"*{payload[key]}*\n\n"
-            else:
-                output_str +=f"*{key}*: {payload[key]}\n"
-                
-        pyperclip.copy(output_str)        
+        output_str = gerar_payload_e_output(payload)       
 
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Information)
@@ -120,7 +109,9 @@ class WindowMS(QDialog):
     def createForm(self):
         layout = QFormLayout()
         layout.addRow("Operador", self.operador_ComboBox)
-        layout.addRow("Horário", self.horario_LineEdit)
+        
+        layout.addRow("Horário", self.hourWidget)
+        
         layout.addRow("End_id", self.end_id_LineEdit)
         layout.addRow("Tipo de Alarme", self.tipo_de_alarme_ComboBox)
         layout.addRow("TSK / EVE", self.tskeve_LineEdit)

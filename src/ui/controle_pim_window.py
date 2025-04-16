@@ -3,16 +3,17 @@ from PyQt5.QtCore import Qt,QStringListModel
 
 import datetime
 import json
-import pyperclip
 from services.lookup_service import fetch_datalookup
 from services.weather_service import get_weather_data
 from services.email_service import send_mail
 from utils.resource import externalPath
-from utils.strings import sanitize_string
 from utils.datetime_utils import get_greeting
+from utils.payload_utils import gerar_payload_e_output
 
 from ui.widgets.spell_check_plain_text_edit import SpellCheckPlainTextEdit
 from ui.widgets.uppercase_line_edit import UpperCaseLineEdit
+from ui.widgets.operator_combobox import OperatorComboBox
+from ui.widgets.combobox_options import load_combobox_options
 
 
 with open(externalPath('data/combobox_options.json'), 'r',encoding='utf-8') as file:
@@ -24,7 +25,9 @@ class WindowControlePIM(QDialog):
         self.setWindowTitle("Gerador de texto")
 
         self.formGroupBox = QGroupBox("Infraestrutura Hypermatrix")
-        self.operador_ComboBox = QComboBox()
+        
+        self.operador_ComboBox = OperatorComboBox()        
+        
         self.end_id_LineEdit = UpperCaseLineEdit()
         self.tipo_de_alarme_ComboBox = QComboBox()
         self.alarmou_no_netcool_ComboBox = QComboBox()
@@ -54,15 +57,15 @@ class WindowControlePIM(QDialog):
 
         self.nome_owner_ComboBox.setCompleter(completer)
 
-        self.operador_ComboBox.addItems(combobox_options['operador'])
-        self.tipo_de_alarme_ComboBox.addItems(combobox_options['tipo_de_alarme'])
-        self.descricao_do_evento_ComboBox.addItems(combobox_options['descricao_do_evento'])
-        self.alarmou_no_netcool_ComboBox.addItems(combobox_options['alarmou_no_netcool'])
-        self.alarmou_no_servicenow_ComboBox.addItems(combobox_options['alarmou_no_servicenow'])
-        self.status_do_alarme_ComboBox.addItems(combobox_options['status_do_alarme'])
-        self.sala_de_crise_ComboBox.addItems(combobox_options['sala_de_crise'])
-        self.desservico_ComboBox.addItems(combobox_options['desservico'])
-        self.ownertim_acionado_ComboBox.addItems(combobox_options['ownertim_acionado'])
+        
+        load_combobox_options(self.tipo_de_alarme_ComboBox, 'tipo_de_alarme')
+        load_combobox_options(self.descricao_do_evento_ComboBox, 'descricao_do_evento')
+        load_combobox_options(self.alarmou_no_netcool_ComboBox, 'alarmou_no_netcool')
+        load_combobox_options(self.alarmou_no_servicenow_ComboBox, 'alarmou_no_servicenow')
+        load_combobox_options(self.status_do_alarme_ComboBox, 'status_do_alarme')
+        load_combobox_options(self.sala_de_crise_ComboBox, 'sala_de_crise')
+        load_combobox_options(self.desservico_ComboBox, 'desservico')
+        load_combobox_options(self.ownertim_acionado_ComboBox, 'ownertim_acionado')       
         
 
         self.createForm()
@@ -131,22 +134,7 @@ class WindowControlePIM(QDialog):
             'Precipitação (mm)': str(weather.get('precipitation', ''))
         }
 
-        for k in payload:
-            payload[k] = sanitize_string(payload[k])
-
-        # Convert and write JSON object to file
-        with open('payload.json', 'w', encoding='utf-8') as f:
-            json.dump(payload, f, ensure_ascii=False, indent=4)
-
-        output_str = ''
-        
-        for key in payload:
-            if key == 'Assunto':
-                output_str +=f"*{payload[key]}*\n\n"
-            else:
-                output_str +=f"*{key}*: {payload[key]}\n"
-
-        pyperclip.copy("	".join(v for k, v in payload.items() if k != 'Assunto'))
+        output_str = gerar_payload_e_output(payload)
 
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Information)

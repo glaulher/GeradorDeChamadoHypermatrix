@@ -1,23 +1,22 @@
 import datetime
 import json
-import pyperclip
 
 from PyQt5.QtWidgets import *
+from PyQt5.QtCore import Qt,QStringListModel
 
 from services.lookup_service import fetch_datalookup
 from services.email_service import send_mail
 from services.diesel_service import get_diesel_data, DieselDataError
 
 from utils.resource import externalPath
-from utils.strings import sanitize_string
 from utils.datetime_utils import get_greeting
+from utils.payload_utils import gerar_payload_e_output
 
 from ui.widgets.spell_check_plain_text_edit import SpellCheckPlainTextEdit
 from ui.widgets.uppercase_line_edit import UpperCaseLineEdit
-
-
-with open(externalPath('data/combobox_options.json'), 'r', encoding='utf-8') as file:
-    combobox_options = json.load(file)
+from ui.widgets.operator_combobox import OperatorComboBox
+from ui.widgets.hour_widget import HourWidget
+from ui.widgets.combobox_options import load_combobox_options
 
 class WindowMB(QDialog):
     def __init__(self):
@@ -25,8 +24,10 @@ class WindowMB(QDialog):
         self.setWindowTitle("Gerador de chamados MAIN BUILDING")
 
         self.formGroupBox = QGroupBox("Chamados MAIN BUILDING")
-        self.operador_ComboBox = QComboBox()
-        self.horario_LineEdit = QLineEdit(datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S"))
+        
+        self.operador_ComboBox = OperatorComboBox()
+        self.hourWidget = HourWidget()
+        
         self.ne_name_LineEdit = UpperCaseLineEdit()
         self.tipo_de_alarme_ComboBox = QComboBox()
         self.tipo_de_alarme_ComboBox.currentIndexChanged.connect(self.change_alarm_type)
@@ -37,9 +38,9 @@ class WindowMB(QDialog):
         self.atualizacao_PlainText = SpellCheckPlainTextEdit()
         
         self.ne_name_LineEdit.textChanged.connect(self.on_ne_name_changed)
-        self.operador_ComboBox.addItems(combobox_options['operador'])
-        self.tipo_de_alarme_ComboBox.addItems(combobox_options['tipo_de_alarme'])
-        self.gmg_monitorado_ComboBox.addItems(combobox_options['gmg_monitorado'])
+        
+        load_combobox_options(self.tipo_de_alarme_ComboBox, 'tipo_de_alarme')
+        load_combobox_options(self.gmg_monitorado_ComboBox, 'gmg_monitorado')
 
         self.createForm()
         self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok)
@@ -53,7 +54,7 @@ class WindowMB(QDialog):
     def on_ne_name_changed(self, text):
         if len(text.strip()) == 7:
             self.change_alarm_type()
-
+    
     def getInfo(self):
         ne_name = self.ne_name_LineEdit.text().strip().upper()
         if fetch_datalookup('NE_NAME', ne_name, 'CLASSIFICAÇÃO') is None:
@@ -90,20 +91,7 @@ class WindowMB(QDialog):
         payload['TSK/EVE'] = "{0}".format(self.tskeve_LineEdit.text())       
         payload['Atualização'] = "{0}".format(self.atualizacao_PlainText.toPlainText())
 
-        for k in payload:
-            payload[k] = sanitize_string(payload[k])
-
-        with open('payload.json', 'w', encoding='utf-8') as f:
-            json.dump(payload, f, ensure_ascii=False, indent=4)
-
-        output_str = ''
-        for key in payload:
-            if key == 'Assunto':
-                output_str +=f"*{payload[key]}*\n\n"
-            else:
-                output_str +=f"*{key}*: {payload[key]}\n"
-                
-        pyperclip.copy(output_str)
+        output_str = gerar_payload_e_output(payload)
 
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Information)
@@ -178,7 +166,9 @@ class WindowMB(QDialog):
     def createForm(self):
         layout = QFormLayout()
         layout.addRow("Operador", self.operador_ComboBox)
-        layout.addRow("Horário", self.horario_LineEdit)
+        
+        layout.addRow("Horário", self.hourWidget)
+        
         layout.addRow("NE_NAME", self.ne_name_LineEdit)
         layout.addRow("Tipo de Alarme", self.tipo_de_alarme_ComboBox)
         layout.addRow("Volume de Diesel (litros)", self.volume_diesel_LineEdit)

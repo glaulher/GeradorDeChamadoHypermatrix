@@ -30,10 +30,11 @@ class SpellCheckPlainTextEdit(QPlainTextEdit):
     def load_personal_dict(self, path):
         if os.path.exists(path):
             with open(path, 'r', encoding='utf-8') as f:
-                words = [line.strip().lower() for line in f if line.strip()]
+                words = [line.strip() for line in f if line.strip()]
                 
                 self.spell = SpellChecker(language='pt')
-                self.spell.word_frequency.load_words(words)
+                self.spell.word_frequency.load_words([w.lower() for w in words])
+                self.highlighter.sensitive_words = set(words)
                 
                 self.highlighter.spell = self.spell
     

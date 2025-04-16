@@ -6,9 +6,11 @@
         "José Pacheco",
         "Marcelo Borillo",
         "Renato Santos",
+	"Rodrigo Britto",
         "Vitor Abrantes",
         "Yan Pedro",
         "Erick Silva",
+        "Acácio Bergamini",
         "TESTE"
     ],
     "tipo_de_alarme":[
@@ -63,6 +65,7 @@
         "MB:Ricardo Galvão", 
         "MB:Uilson Cabral", 
         "MB:André Reichow Krause",
+        "MS:Renato Suzin",
         "MS:André Luis Vieira",
         "MS:Thiago Martins",
         "MS:Guilherme Laubert",
@@ -70,7 +73,9 @@
         "MS:William Jackys",
         "MS:Flávio de Sá Coelho",
         "MS:Almir",
-        "MS:Alessandra Veloso"
+        "MS:Alessandra Veloso",
+        "MS:Hilton",
+        "MS:Ricardo"
     ],
     "motivacao":[
         "Preditiva",

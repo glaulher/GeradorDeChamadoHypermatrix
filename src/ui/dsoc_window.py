@@ -1,8 +1,12 @@
-import datetime
-import json
-
-from PyQt5.QtCore import QStringListModel, Qt
-from PyQt5.QtWidgets import *
+from PySide6.QtWidgets import (
+    QComboBox,
+    QDialog,
+    QDialogButtonBox,
+    QFormLayout,
+    QGroupBox,
+    QMessageBox,
+    QVBoxLayout,
+)
 
 from services.email_service import send_mail
 from services.lookup_service import fetch_datalookup
@@ -14,7 +18,6 @@ from ui.widgets.spell_check_plain_text_edit import SpellCheckPlainTextEdit
 from ui.widgets.uppercase_line_edit import UpperCaseLineEdit
 from utils.datetime_utils import get_greeting
 from utils.payload_utils import gerar_payload_e_output
-from utils.resource import externalPath
 
 
 class WindowDSOC(QDialog):
@@ -22,32 +25,32 @@ class WindowDSOC(QDialog):
         super(WindowDSOC, self).__init__()
         self.setWindowTitle("Gerador de chamados DSOC")
 
-        self.formGroupBox = QGroupBox("Chamados DSOC")
+        self.form_groupbox = QGroupBox("Chamados DSOC")
 
-        self.operador_ComboBox = OperatorComboBox()
-        self.hourWidget = HourWidget()
+        self.operator_combobox = OperatorComboBox()
+        self.hour_widget = HourWidget()
 
-        self.motivacao_ComboBox = QComboBox()
-        self.tipo_de_alarme_ComboBox = QComboBox()
-        self.gravidade_ComboBox = QComboBox()
-        self.ne_name_LineEdit = UpperCaseLineEdit()
-        self.causa_PlainText = SpellCheckPlainTextEdit()
+        self.motivation_combobox = QComboBox()
+        self.alarm_type_combobox = QComboBox()
+        self.gravity_combobox = QComboBox()
+        self.ne_name_line_edit = UpperCaseLineEdit()
+        self.update_plain_text = SpellCheckPlainTextEdit()
 
-        load_combobox_options(self.motivacao_ComboBox, "motivacao")
-        load_combobox_options(self.tipo_de_alarme_ComboBox, "tipo_de_alarme")
-        load_combobox_options(self.gravidade_ComboBox, "gravidade")
+        load_combobox_options(self.motivation_combobox, "motivacao")
+        load_combobox_options(self.alarm_type_combobox, "tipo_de_alarme")
+        load_combobox_options(self.gravity_combobox, "gravidade")
 
-        self.createForm()
-        self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok)
-        self.buttonBox.accepted.connect(self.getInfo)
+        self.create_form()
+        self.buttonbox = QDialogButtonBox(QDialogButtonBox.Ok)
+        self.buttonbox.accepted.connect(self.get_info)
 
-        subLayout = QVBoxLayout()
-        subLayout.addWidget(self.formGroupBox)
-        subLayout.addWidget(self.buttonBox)
-        self.setLayout(subLayout)
+        sublayout = QVBoxLayout()
+        sublayout.addWidget(self.form_groupbox)
+        sublayout.addWidget(self.buttonbox)
+        self.setLayout(sublayout)
 
-    def getInfo(self):
-        ne_name = self.ne_name_LineEdit.text()
+    def get_info(self):
+        ne_name = self.ne_name_line_edit.text()
         if fetch_datalookup("NE_NAME", ne_name, "CLASSIFICAÇÃO") is None:
             QMessageBox.information(self, "Aviso", f"NE_NAME: {ne_name} não encontrado")
 
@@ -60,17 +63,17 @@ class WindowDSOC(QDialog):
 
         payload = {
             "Assunto": "Prezados! Solicitamos a abertura de chamado para o prédio industrial abaixo:",
-            "Operador": self.operador_ComboBox.currentText(),
-            "Horário": self.hourWidget.text(),
+            "Operador": self.operator_combobox.currentText(),
+            "Horário": self.hour_widget.text(),
             "Motivação": fetch_datalookup("END_ID", end_id, "SUBCLASS"),
-            "Alarme": self.tipo_de_alarme_ComboBox.currentText(),
-            "Gravidade": self.gravidade_ComboBox.currentText(),
+            "Alarme": self.alarm_type_combobox.currentText(),
+            "Gravidade": self.gravity_combobox.currentText(),
             "Nome do prédio": nome_do_predio,
             "NE_NAME": ne_name,
             "END_ID": end_id,
             "Regional": regional,
             "UF": uf,
-            "Causa": self.causa_PlainText.toPlainText(),
+            "Causa": self.update_plain_text.toPlainText(),
         }
 
         output_str = gerar_payload_e_output(payload)
@@ -82,7 +85,10 @@ class WindowDSOC(QDialog):
 
         if confirmed:
             email_data = {
-                "subject": f"PIM - Report | Abertura de chamado para: - {nome_do_predio} | {ne_name} - {end_id} ({regional}/{uf}) - {payload['Alarme']}",
+                "subject": (
+                    f"PIM - Report | Abertura de chamado para: - {nome_do_predio} | "
+                    f"{ne_name} - {end_id} ({regional}/{uf}) - {payload['Alarme']}"
+                ),
                 "greeting": get_greeting(),
                 "sender_name": "Equipe PIM",
                 "payload": payload,
@@ -95,26 +101,29 @@ class WindowDSOC(QDialog):
                     "Sucesso",
                     "✅ E-mail enviado com sucesso!\n📋 Texto copiado para o clipboard.",
                 )
-            except Exception as e:
+            except Exception as e:  # pylint: disable=broad-exception-caught
                 QMessageBox.critical(
                     self,
                     "Erro",
-                    f"❌ Erro ao enviar o e-mail.\nVerifique sua conexão e tente novamente.\n\nDetalhes técnicos:\n{str(e)}",
+                    (
+                        f"❌ Erro ao enviar o e-mail.\nVerifique sua conexão e tente novamente.\n\n"
+                        f"Detalhes técnicos:\n{str(e)}"
+                    ),
                 )
         else:
             QMessageBox.information(
                 self, "Sucesso", "✅ Texto copiado para o clipboard."
             )
 
-    def createForm(self):
+    def create_form(self):
         layout = QFormLayout()
-        layout.addRow("Operador", self.operador_ComboBox)
+        layout.addRow("Operador", self.operator_combobox)
 
-        layout.addRow("Horário", self.hourWidget)
+        layout.addRow("Horário", self.hour_widget)
 
-        layout.addRow("Motivação", self.motivacao_ComboBox)
-        layout.addRow("Tipo de Alarme", self.tipo_de_alarme_ComboBox)
-        layout.addRow("Gravidade", self.gravidade_ComboBox)
-        layout.addRow("NE_NAME", self.ne_name_LineEdit)
-        layout.addRow("Causa", self.causa_PlainText)
-        self.formGroupBox.setLayout(layout)
+        layout.addRow("Motivação", self.motivation_combobox)
+        layout.addRow("Tipo de Alarme", self.alarm_type_combobox)
+        layout.addRow("Gravidade", self.gravity_combobox)
+        layout.addRow("NE_NAME", self.ne_name_line_edit)
+        layout.addRow("Causa", self.update_plain_text)
+        self.form_groupbox.setLayout(layout)

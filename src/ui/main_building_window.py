@@ -118,8 +118,8 @@ class WindowMB(QDialog):
         if confirmed:
             email_data = {
                 "subject": (
-                    f"PIM - Report Main Site | Main Site: {classificacao} - {nome_do_predio} | "
-                    f"{end_id} ({regional}/{uf}) - {alarme}"
+                    f"PIM - Report Main Building | Main Building: {classificacao} - {nome_do_predio} | "
+                    f"{ne_name} - {end_id} ({regional}/{uf}) - {alarme}"
                 ),
                 "greeting": get_greeting(),
                 "sender_name": "Equipe PIM",

@@ -2,8 +2,8 @@ import json
 import os
 
 from PySide6.QtCore import QPoint, Qt, QTimer
-from PySide6.QtGui import QTextCursor
-from PySide6.QtWidgets import QAction, QMenu, QPlainTextEdit
+from PySide6.QtGui import QAction, QTextCursor
+from PySide6.QtWidgets import QMenu, QPlainTextEdit
 
 from spellchecker import SpellChecker
 from utils.resource import externalPath

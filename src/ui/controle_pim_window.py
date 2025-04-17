@@ -1,8 +1,17 @@
 import datetime
 import json
 
-from PyQt5.QtCore import QStringListModel, Qt
-from PyQt5.QtWidgets import *
+from PySide6.QtCore import QStringListModel, Qt
+from PySide6.QtWidgets import (
+    QComboBox,
+    QCompleter,
+    QDialog,
+    QDialogButtonBox,
+    QFormLayout,
+    QGroupBox,
+    QMessageBox,
+    QVBoxLayout,
+)
 
 from services.email_service import send_mail
 from services.lookup_service import fetch_datalookup
@@ -25,32 +34,32 @@ class WindowControlePIM(QDialog):
         super(WindowControlePIM, self).__init__()
         self.setWindowTitle("Gerador de texto")
 
-        self.formGroupBox = QGroupBox("Infraestrutura Hypermatrix")
+        self.form_groupbox = QGroupBox("Infraestrutura Hypermatrix")
 
-        self.operador_ComboBox = OperatorComboBox()
+        self.operator_combobox = OperatorComboBox()
 
-        self.end_id_LineEdit = UpperCaseLineEdit()
-        self.tipo_de_alarme_ComboBox = QComboBox()
-        self.alarmou_no_netcool_ComboBox = QComboBox()
-        self.alarmou_no_servicenow_ComboBox = QComboBox()
-        self.status_do_alarme_ComboBox = QComboBox()
-        self.descricao_do_evento_ComboBox = QComboBox()
-        self.numero_do_evento_LineEdit = UpperCaseLineEdit()
-        self.observacoes_PlainText = SpellCheckPlainTextEdit()
-        self.sala_de_crise_ComboBox = QComboBox()
-        self.desservico_ComboBox = QComboBox()
-        self.ownertim_acionado_ComboBox = QComboBox()
+        self.end_id_line_edit = UpperCaseLineEdit()
+        self.alarm_type_combobox = QComboBox()
+        self.netcool_combobox = QComboBox()
+        self.servicenow_combobox = QComboBox()
+        self.alarm_status_combobox = QComboBox()
+        self.event_combobox = QComboBox()
+        self.event_number_line_edit = UpperCaseLineEdit()
+        self.update_plain_text = SpellCheckPlainTextEdit()
+        self.war_room_combobox = QComboBox()
+        self.unavailability_combobox = QComboBox()
+        self.ownertim_triggered_combobox = QComboBox()
 
-        self.nome_owner_ComboBox = QComboBox()
-        self.nome_owner_ComboBox.setEditable(True)
-        self.nome_owner_ComboBox.setInsertPolicy(QComboBox.NoInsert)
+        self.owner_name_combobox = QComboBox()
+        self.owner_name_combobox.setEditable(True)
+        self.owner_name_combobox.setInsertPolicy(QComboBox.NoInsert)
 
         nome_owner_list = sorted(
             set([item.strip() for item in combobox_options["nome_owner"]])
         )
         nome_owner_model = QStringListModel(nome_owner_list)
 
-        self.nome_owner_ComboBox.addItems(nome_owner_list)
+        self.owner_name_combobox.addItems(nome_owner_list)
 
         completer = QCompleter()
         completer.setModel(nome_owner_model)
@@ -58,30 +67,28 @@ class WindowControlePIM(QDialog):
         completer.setFilterMode(Qt.MatchContains)
         completer.setCaseSensitivity(Qt.CaseInsensitive)
 
-        self.nome_owner_ComboBox.setCompleter(completer)
+        self.owner_name_combobox.setCompleter(completer)
 
-        load_combobox_options(self.tipo_de_alarme_ComboBox, "tipo_de_alarme")
-        load_combobox_options(self.descricao_do_evento_ComboBox, "descricao_do_evento")
-        load_combobox_options(self.alarmou_no_netcool_ComboBox, "alarmou_no_netcool")
-        load_combobox_options(
-            self.alarmou_no_servicenow_ComboBox, "alarmou_no_servicenow"
-        )
-        load_combobox_options(self.status_do_alarme_ComboBox, "status_do_alarme")
-        load_combobox_options(self.sala_de_crise_ComboBox, "sala_de_crise")
-        load_combobox_options(self.desservico_ComboBox, "desservico")
-        load_combobox_options(self.ownertim_acionado_ComboBox, "ownertim_acionado")
+        load_combobox_options(self.alarm_type_combobox, "tipo_de_alarme")
+        load_combobox_options(self.descricao_do_bvento_ComboBox, "descricao_do_evento")
+        load_combobox_options(self.netcool_comboBox, "alarmou_no_netcool")
+        load_combobox_options(self.servicenow_combobox, "alarmou_no_servicenow")
+        load_combobox_options(self.alarm_status_combobox, "status_do_alarme")
+        load_combobox_options(self.war_room_combobox, "sala_de_crise")
+        load_combobox_options(self.unavailability_combobox, "desservico")
+        load_combobox_options(self.ownertim_triggered_combobox, "ownertim_acionado")
 
-        self.createForm()
-        self.buttonBox = QDialogButtonBox(QDialogButtonBox.Ok)
-        self.buttonBox.accepted.connect(self.getInfo)
+        self.create_form()
+        self.buttonbox = QDialogButtonBox(QDialogButtonBox.Ok)
+        self.buttonbox.accepted.connect(self.get_info)
 
-        subLayout = QVBoxLayout()
-        subLayout.addWidget(self.formGroupBox)
-        subLayout.addWidget(self.buttonBox)
-        self.setLayout(subLayout)
+        sublayout = QVBoxLayout()
+        sublayout.addWidget(self.form_groupbox)
+        sublayout.addWidget(self.buttonbox)
+        self.setLayout(sublayout)
 
-    def getInfo(self):
-        end_id = self.end_id_LineEdit.text()
+    def get_info(self):
+        end_id = self.end_id_line_edit.text()
         if fetch_datalookup("END_ID", end_id, "CLASSIFICAÇÃO") is None:
             QMessageBox.information(self, "Aviso", f"END_ID: {end_id} não encontrado")
 
@@ -93,7 +100,7 @@ class WindowControlePIM(QDialog):
         try:
             weather_data = get_weather_data(latitude, longitude)
 
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-exception-caught
             QMessageBox.critical(
                 self,
                 "Erro ao obter dados climáticos",
@@ -112,17 +119,17 @@ class WindowControlePIM(QDialog):
             "CLASSIFICAÇÃO": fetch_datalookup("END_ID", end_id, "CLASSIFICAÇÃO"),
             "TOPOLOGIA": fetch_datalookup("END_ID", end_id, "SUBCLASS"),
             "REGIONAL": fetch_datalookup("END_ID", end_id, "REGIONAL"),
-            "TIPO DO EVENTO": self.tipo_de_alarme_ComboBox.currentText(),
-            "ALARMOU NO NETCOOL": self.alarmou_no_netcool_ComboBox.currentText(),
-            "ALARMOU NO SERVICENOW": self.alarmou_no_servicenow_ComboBox.currentText(),
-            "STATUS DO ALARME": self.status_do_alarme_ComboBox.currentText(),
-            "DESCRICAO EVENTO": self.descricao_do_evento_ComboBox.currentText(),
-            "NUMERO EVENTO": self.numero_do_evento_LineEdit.text(),
-            "OBSERVACOES/RECOMENDACOES": self.observacoes_PlainText.toPlainText(),
-            "SALA DE CRISE?": self.sala_de_crise_ComboBox.currentText(),
-            "DESSERVICO?": self.desservico_ComboBox.currentText(),
-            "Owner TIM acionado?": self.ownertim_acionado_ComboBox.currentText(),
-            "Nome do owner": self.nome_owner_ComboBox.currentText(),
+            "TIPO DO EVENTO": self.alarm_type_combobox.currentText(),
+            "ALARMOU NO NETCOOL": self.netcool_bomboBox.currentText(),
+            "ALARMOU NO SERVICENOW": self.servicenow_combobox.currentText(),
+            "STATUS DO ALARME": self.alarm_status_combobox.currentText(),
+            "DESCRICAO EVENTO": self.event_combobox.currentText(),
+            "NUMERO EVENTO": self.event_number_line_edit.text(),
+            "OBSERVACOES/RECOMENDACOES": self.update_plain_text.toPlainText(),
+            "SALA DE CRISE?": self.war_room_combobox.currentText(),
+            "DESSERVICO?": self.unavailability_combobox.currentText(),
+            "Owner TIM acionado?": self.ownertim_triggered_combobox.currentText(),
+            "Nome do owner": self.owner_name_combobox.currentText(),
             "NUMERO DO RELATORIO DE VULNERABILIDADE (PREENCHIMENTO EQUIPE PREVENTIVA)": "",
             "COMPORTAMENTO ESPERADO? (PREENCHIMENTO EQUIPE PREVENTIVA)": "",
             "QUAL ACAO A SER REALIZADA?(PREENCHIMENTO EQUIPE PREVENTIVA)": "",
@@ -146,7 +153,10 @@ class WindowControlePIM(QDialog):
 
         if confirmed:
             email_data = {
-                "subject": f"PIM - Report | Controle PIM: - {payload['NE_NAME']} | {payload['END_ID']} ({payload['REGIONAL']}) - {payload['TIPO DO EVENTO']}",
+                "subject": (
+                    f"PIM - Report | Controle PIM: - {payload['NE_NAME']} | "
+                    f"{payload['END_ID']} ({payload['REGIONAL']}) - {payload['TIPO DO EVENTO']}"
+                ),
                 "greeting": get_greeting(),
                 "sender_name": "Equipe PIM",
                 "payload": payload,
@@ -159,30 +169,33 @@ class WindowControlePIM(QDialog):
                     "Sucesso",
                     "✅ E-mail enviado com sucesso!\n📋 Texto copiado para o clipboard.",
                 )
-            except Exception as e:
+            except Exception as e:  # pylint: disable=broad-exception-caught
                 QMessageBox.critical(
                     self,
                     "Erro",
-                    f"❌ Erro ao enviar o e-mail.\nVerifique sua conexão e tente novamente.\n\nDetalhes técnicos:\n{str(e)}",
+                    (
+                        f"❌ Erro ao enviar o e-mail.\nVerifique sua conexão e tente novamente.\n\n"
+                        f"Detalhes técnicos:\n{str(e)}"
+                    ),
                 )
         else:
             QMessageBox.information(
                 self, "Sucesso", "✅ Texto copiado para o clipboard."
             )
 
-    def createForm(self):
+    def create_form(self):
         layout = QFormLayout()
         layout.addRow("Operador", self.operador_ComboBox)
-        layout.addRow("END_ID", self.end_id_LineEdit)
-        layout.addRow("Tipo de Evento", self.tipo_de_alarme_ComboBox)
-        layout.addRow("Alarmou no NetCool", self.alarmou_no_netcool_ComboBox)
-        layout.addRow("Alarmou no ServiceNow", self.alarmou_no_servicenow_ComboBox)
-        layout.addRow("Status do Alarme", self.status_do_alarme_ComboBox)
-        layout.addRow("Descrição do evento", self.descricao_do_evento_ComboBox)
-        layout.addRow("Número do evento", self.numero_do_evento_LineEdit)
-        layout.addRow("Observações / Recomendações", self.observacoes_PlainText)
-        layout.addRow("Sala de crise?", self.sala_de_crise_ComboBox)
-        layout.addRow("Desserviço?", self.desservico_ComboBox)
-        layout.addRow("OwnerTim acionado?", self.ownertim_acionado_ComboBox)
-        layout.addRow("Nome Owner", self.nome_owner_ComboBox)
-        self.formGroupBox.setLayout(layout)
+        layout.addRow("END_ID", self.end_id_line_edit)
+        layout.addRow("Tipo de Evento", self.alarm_type_combobox)
+        layout.addRow("Alarmou no NetCool", self.netcool_bomboBox)
+        layout.addRow("Alarmou no ServiceNow", self.servicenow_combobox)
+        layout.addRow("Status do Alarme", self.alarm_status_combobox)
+        layout.addRow("Descrição do evento", self.event_combobox)
+        layout.addRow("Número do evento", self.event_number_line_edit)
+        layout.addRow("Observações / Recomendações", self.update_plain_text)
+        layout.addRow("Sala de crise?", self.war_room_combobox)
+        layout.addRow("Desserviço?", self.unavailability_combobox)
+        layout.addRow("OwnerTim acionado?", self.ownertim_triggered_combobox)
+        layout.addRow("Nome Owner", self.owner_name_combobox)
+        self.form_groupbox.setLayout(layout)

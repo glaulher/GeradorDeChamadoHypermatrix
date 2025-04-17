@@ -31,11 +31,11 @@ class WindowMS(QDialog):
         self.hour_widget = HourWidget()
 
         self.end_id_line_edit = UpperCaseLineEdit()
-        self.type_of_alarm_combobox = QComboBox()
+        self.alarm_type_combobox = QComboBox()
         self.tskeve_line_edit = UpperCaseLineEdit()
         self.update_plain_text = SpellCheckPlainTextEdit()
 
-        load_combobox_options(self.type_of_alarm_combobox, "tipo_de_alarme")
+        load_combobox_options(self.alarm_type_combobox, "tipo_de_alarme")
 
         self.create_form()
         self.button_box = QDialogButtonBox(QDialogButtonBox.Ok)
@@ -58,7 +58,7 @@ class WindowMS(QDialog):
         end_id = str(fetch_datalookup("END_ID", end_id, "END_ID"))
         regional = str(fetch_datalookup("END_ID", end_id, "REGIONAL"))
         uf = str(fetch_datalookup("END_ID", end_id, "UF"))
-        alarme = f"{self.type_of_alarm_combobox.currentText()}"
+        alarme = f"{self.alarm_type_combobox.currentText()}"
 
         payload = {
             "Assunto": "PIM - Report Main Sites",
@@ -120,7 +120,7 @@ class WindowMS(QDialog):
         layout.addRow("Horário", self.hour_widget)
 
         layout.addRow("End_id", self.end_id_line_edit)
-        layout.addRow("Tipo de Alarme", self.type_of_alarm_combobox)
+        layout.addRow("Tipo de Alarme", self.alarm_type_combobox)
         layout.addRow("TSK / EVE", self.tskeve_line_edit)
         layout.addRow("Atualização", self.update_plain_text)
         self.form_group_box.setLayout(layout)

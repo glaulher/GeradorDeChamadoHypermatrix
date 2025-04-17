@@ -1,5 +1,5 @@
-'''
-pip install PyQt5
+"""
+pip install PySide6
 pip install pyinstaller ou pip install nuitka ordered-set zstandard
 pip install pyperclip
 pip install pandas
@@ -47,18 +47,19 @@ nuitka `
 --onefile `
 main_and_builds.py
 
-'''
-
+"""
 
 import sys
 
-from PyQt5.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication
+
 from ui.main_window import MainWindow
 from utils.resource import internalPath
 
-if __name__ == '__main__':   
+if __name__ == "__main__":
     app = QApplication(sys.argv)
-    with open(internalPath("styles/ui.qss"), "r") as f:app.setStyleSheet(f.read())
+    with open(internalPath("styles/ui.qss"), "r", encoding="utf-8") as f:
+        app.setStyleSheet(f.read())
     window = MainWindow()
     window.show()
     sys.exit(app.exec())

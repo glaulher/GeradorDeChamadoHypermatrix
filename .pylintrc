@@ -1,1 +1,29 @@
-extension-pkg-whitelist=PyQt5
+[MASTER]
+ignore=venv
+extension-pkg-whitelist=PySide6
+init-hook='import sys, os; sys.path.append(os.path.abspath("src"))'
+
+
+[MESSAGES CONTROL]
+disable=
+    C0114,  # missing-module-docstring
+    C0115,  # missing-class-docstring
+    C0116,  # missing-function-docstring
+    #W1514,  # unspecified-encoding (pode comentar essa linha se preferir corrigir no código)
+    R0903,  # too-few-public-methods
+    R0801,  # duplicate-code
+
+[TYPECHECK]
+ignored-modules=PySide6.QtWidgets,PySide6.QtGui,PySide6.QtCore
+generated-members=Qt.*,QApplication
+
+[FORMAT]
+max-line-length=120
+
+[REPORTS]
+output-format=colorized
+reports=no
+score=no
+
+[DESIGN]
+max-args=10

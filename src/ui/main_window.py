@@ -1,14 +1,22 @@
-from PyQt5.QtWidgets import QMainWindow, QPushButton,QButtonGroup, QVBoxLayout, QWidget, QHBoxLayout, QStackedWidget
-from PyQt5.QtGui import QIcon
-
 from functools import partial
+
+from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import (
+    QButtonGroup,
+    QHBoxLayout,
+    QMainWindow,
+    QPushButton,
+    QStackedWidget,
+    QVBoxLayout,
+    QWidget,
+)
 
 from ui.controle_pim_window import WindowControlePIM
 from ui.dsoc_window import WindowDSOC
 from ui.main_building_window import WindowMB
 from ui.main_sites_window import WindowMS
-
 from utils.resource import internalPath
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -19,7 +27,8 @@ class MainWindow(QMainWindow):
 
         # Sidebar
         self.sidebar = QWidget()
-        with open(internalPath("styles/sidebar.qss"), "r") as f:self.sidebar.setStyleSheet(f.read())
+        with open(internalPath("styles/sidebar.qss"), "r", encoding="utf-8") as f:
+            self.sidebar.setStyleSheet(f.read())
         self.sidebar.setObjectName("sidebar")
         self.sidebar_layout = QVBoxLayout()
         self.sidebar.setLayout(self.sidebar_layout)
@@ -30,13 +39,18 @@ class MainWindow(QMainWindow):
         self.pages = [WindowControlePIM(), WindowDSOC(), WindowMB(), WindowMS()]
 
         for page in self.pages:
-            self.stack.addWidget(page)        
-        
+            self.stack.addWidget(page)
+
         # Sidebar buttons
         self.button_group = QButtonGroup()
         self.button_group.setExclusive(True)
         self.sidebar_buttons = []
-        button_texts = ["Gerador de Linhas", "Chamado DSOC", "Main Building", "Main Sites"]
+        button_texts = [
+            "Gerador de Linhas",
+            "Chamado DSOC",
+            "Main Building",
+            "Main Sites",
+        ]
 
         for index, text in enumerate(button_texts):
             btn = QPushButton(text)
@@ -56,7 +70,7 @@ class MainWindow(QMainWindow):
         central_widget.setLayout(main_layout)
         self.setCentralWidget(central_widget)
 
-        # Ativar a primeira página e botão ao abrir
+        # Active first page
         self.set_active(0)
 
     def set_active(self, index):

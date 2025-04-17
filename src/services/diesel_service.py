@@ -19,8 +19,14 @@ def get_diesel_data(ne_name: str):
         gid_main_building = os.getenv("GID_MAIN_BUILDING")
         gid_controle_diesel = os.getenv("GID_CONTROLE_DIESEL")
 
-        url_main_building = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={gid_main_building}"
-        url_controle_diesel = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={gid_controle_diesel}"
+        url_main_building = (
+            f"https://docs.google.com/spreadsheets/d/"
+            f"{sheet_id}/export?format=csv&gid={gid_main_building}"
+        )
+        url_controle_diesel = (
+            f"https://docs.google.com/spreadsheets/d/{sheet_id}"
+            f"/export?format=csv&gid={gid_controle_diesel}"
+        )
 
         df_main_building = pd.read_csv(url_main_building, usecols=["NE_NAME", "END_ID"])
         df_controle_diesel = pd.read_csv(

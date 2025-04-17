@@ -1,5 +1,6 @@
 import requests
 
+
 def get_weather_data(latitude, longitude):
     url = (
         f"https://api.open-meteo.com/v1/forecast"
@@ -8,7 +9,7 @@ def get_weather_data(latitude, longitude):
     )
     try:
         response = requests.get(url, timeout=10)
-        response.raise_for_status()  
+        response.raise_for_status()
         return response.json()
     except (requests.ConnectionError, requests.Timeout) as error:
         raise ConnectionError("Erro de conexão com o serviço de clima.") from error

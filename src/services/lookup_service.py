@@ -12,5 +12,5 @@ def fetch_datalookup(search_key, search_term, return_col):
     try:
         value = str(df_filtered[return_col].values[0])
         return None if value == "nan" else value
-    except:
+    except IndexError:
         return None

@@ -1,9 +1,8 @@
 import json
 
-from PyQt5.QtCore import QStringListModel, Qt
-from PyQt5.QtWidgets import QComboBox, QCompleter
+from PySide6.QtCore import QStringListModel, Qt
+from PySide6.QtWidgets import QComboBox, QCompleter
 
-from ui.widgets.combobox_options import load_combobox_options
 from utils.resource import externalPath
 
 

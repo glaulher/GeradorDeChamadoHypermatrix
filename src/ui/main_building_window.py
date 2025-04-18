@@ -19,7 +19,7 @@ from ui.widgets.operator_combobox import OperatorComboBox
 from ui.widgets.spell_check_plain_text_edit import SpellCheckPlainTextEdit
 from ui.widgets.uppercase_line_edit import UpperCaseLineEdit
 from utils.datetime_utils import get_greeting
-from utils.payload_utils import gerar_payload_e_output
+from utils.payload_utils import payload_and_output
 
 
 class WindowMB(QDialog):
@@ -108,7 +108,7 @@ class WindowMB(QDialog):
         payload["TSK/EVE"] = f"{self.tskeve_line_edit.text()}"
         payload["Atualização"] = f"{self.update_plain_text.toPlainText()}"
 
-        output_str = gerar_payload_e_output(payload)
+        output_str = payload_and_output(payload)
 
         confirmed = show_confirmation_dialog(
             f"Favor verificar se o chamado está correto:\n\n{output_str}\n\nConfirma o envio do email?",

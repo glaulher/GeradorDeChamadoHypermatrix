@@ -3,7 +3,7 @@ import json
 from PySide6.QtCore import QStringListModel, Qt
 from PySide6.QtWidgets import QComboBox, QCompleter
 
-from utils.resource import externalPath
+from utils.resource import external_path
 
 
 class OperatorComboBox(QComboBox):
@@ -13,7 +13,7 @@ class OperatorComboBox(QComboBox):
         self.setInsertPolicy(QComboBox.NoInsert)
 
         with open(
-            externalPath("data/combobox_options.json"), "r", encoding="utf-8"
+            external_path("data/combobox_options.json"), "r", encoding="utf-8"
         ) as file:
             combobox_options = json.load(file)
 

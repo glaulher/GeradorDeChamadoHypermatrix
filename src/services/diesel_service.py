@@ -3,9 +3,9 @@ import os
 import pandas as pd
 import requests
 
-from utils.resource import loadEnvFile
+from utils.resource import load_env_file
 
-loadEnvFile()
+load_env_file()
 
 
 class DieselDataError(Exception):

@@ -22,16 +22,16 @@ from ui.widgets.operator_combobox import OperatorComboBox
 from ui.widgets.spell_check_plain_text_edit import SpellCheckPlainTextEdit
 from ui.widgets.uppercase_line_edit import UpperCaseLineEdit
 from utils.datetime_utils import get_greeting
-from utils.payload_utils import gerar_payload_e_output
-from utils.resource import externalPath
+from utils.payload_utils import payload_and_output
+from utils.resource import external_path
 
-with open(externalPath("data/combobox_options.json"), "r", encoding="utf-8") as file:
+with open(external_path("data/combobox_options.json"), "r", encoding="utf-8") as file:
     combobox_options = json.load(file)
 
 
-class WindowControlePIM(QDialog):
+class WindowControlPIM(QDialog):
     def __init__(self):
-        super(WindowControlePIM, self).__init__()
+        super(WindowControlPIM, self).__init__()
         self.setWindowTitle("Gerador de texto")
 
         self.form_groupbox = QGroupBox("Infraestrutura Hypermatrix")
@@ -46,6 +46,7 @@ class WindowControlePIM(QDialog):
         self.event_combobox = QComboBox()
         self.event_number_line_edit = UpperCaseLineEdit()
         self.update_plain_text = SpellCheckPlainTextEdit()
+
         self.war_room_combobox = QComboBox()
         self.unavailability_combobox = QComboBox()
         self.ownertim_triggered_combobox = QComboBox()
@@ -70,8 +71,8 @@ class WindowControlePIM(QDialog):
         self.owner_name_combobox.setCompleter(completer)
 
         load_combobox_options(self.alarm_type_combobox, "tipo_de_alarme")
-        load_combobox_options(self.descricao_do_bvento_ComboBox, "descricao_do_evento")
-        load_combobox_options(self.netcool_comboBox, "alarmou_no_netcool")
+        load_combobox_options(self.event_combobox, "descricao_do_evento")
+        load_combobox_options(self.netcool_combobox, "alarmou_no_netcool")
         load_combobox_options(self.servicenow_combobox, "alarmou_no_servicenow")
         load_combobox_options(self.alarm_status_combobox, "status_do_alarme")
         load_combobox_options(self.war_room_combobox, "sala_de_crise")
@@ -112,7 +113,7 @@ class WindowControlePIM(QDialog):
 
         payload = {
             "Assunto": "Abertura de chamado. Controle PIM",
-            "OPERADOR": self.operador_ComboBox.currentText(),
+            "OPERADOR": self.operator_combobox.currentText(),
             "DATA EVENTO": str(datetime.date.today()),
             "END_ID": end_id,
             "NE_NAME": fetch_datalookup("END_ID", end_id, "NE NAME"),
@@ -120,7 +121,7 @@ class WindowControlePIM(QDialog):
             "TOPOLOGIA": fetch_datalookup("END_ID", end_id, "SUBCLASS"),
             "REGIONAL": fetch_datalookup("END_ID", end_id, "REGIONAL"),
             "TIPO DO EVENTO": self.alarm_type_combobox.currentText(),
-            "ALARMOU NO NETCOOL": self.netcool_bomboBox.currentText(),
+            "ALARMOU NO NETCOOL": self.netcool_combobox.currentText(),
             "ALARMOU NO SERVICENOW": self.servicenow_combobox.currentText(),
             "STATUS DO ALARME": self.alarm_status_combobox.currentText(),
             "DESCRICAO EVENTO": self.event_combobox.currentText(),
@@ -144,7 +145,7 @@ class WindowControlePIM(QDialog):
             "Precipitação (mm)": str(weather.get("precipitation", "")),
         }
 
-        output_str = gerar_payload_e_output(payload)
+        output_str = payload_and_output(payload)
 
         confirmed = show_confirmation_dialog(
             f"Favor verificar se o chamado está correto:\n\n{output_str}\n\nConfirma o envio do email?",
@@ -185,10 +186,10 @@ class WindowControlePIM(QDialog):
 
     def create_form(self):
         layout = QFormLayout()
-        layout.addRow("Operador", self.operador_ComboBox)
+        layout.addRow("Operador", self.operator_combobox)
         layout.addRow("END_ID", self.end_id_line_edit)
         layout.addRow("Tipo de Evento", self.alarm_type_combobox)
-        layout.addRow("Alarmou no NetCool", self.netcool_bomboBox)
+        layout.addRow("Alarmou no NetCool", self.netcool_combobox)
         layout.addRow("Alarmou no ServiceNow", self.servicenow_combobox)
         layout.addRow("Status do Alarme", self.alarm_status_combobox)
         layout.addRow("Descrição do evento", self.event_combobox)

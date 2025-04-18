@@ -1,32 +1,28 @@
 import json
 import os
 
-from PySide6.QtCore import QPoint, Qt, QTimer
+from PySide6.QtCore import QPoint, Qt
 from PySide6.QtGui import QAction, QTextCursor
 from PySide6.QtWidgets import QMenu, QPlainTextEdit
 
 from spellchecker import SpellChecker
-from utils.resource import externalPath
+from utils.resource import external_path
 from utils.spell_highlighter import SpellHighlighter
 
 
 class SpellCheckPlainTextEdit(QPlainTextEdit):
     def __init__(self):
         super().__init__()
+
         self.spell = SpellChecker(language="pt")
         self.highlighter = SpellHighlighter(self.document())
-        self.load_personal_dict(externalPath("data/dicionario_personalizado.txt"))
-
-        self.textChanged.connect(self._delayed_check)
-        self._timer = QTimer(self)
-        self._timer.setSingleShot(True)
-        self._timer.timeout.connect(self._check_spelling)
+        self.load_personal_dict(external_path("data/dicionario_personalizado.txt"))
 
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.show_spellcheck_menu)
 
         with open(
-            externalPath("data/correcoes_personalizadas.json"), "r", encoding="utf-8"
+            external_path("data/correcoes_personalizadas.json"), "r", encoding="utf-8"
         ) as file:
             self.custom_corrections = json.load(file)
 
@@ -40,19 +36,13 @@ class SpellCheckPlainTextEdit(QPlainTextEdit):
                 self.highlighter.sensitive_words = set(words)
 
                 self.highlighter.spell = self.spell
+                self.highlighter.rehighlight()
 
     def load_custom_corrections(self, path):
         if os.path.exists(path):
             with open(path, "r", encoding="utf-8") as f:
                 return json.load(f)
         return {}
-
-    def _delayed_check(self):
-        self._timer.start(1000)
-
-    def _check_spelling(self):
-        text = self.toPlainText()
-        self.highlighter.checkText(text)
 
     def show_spellcheck_menu(self, point: QPoint):
         cursor = self.cursorForPosition(point)
@@ -89,7 +79,7 @@ class SpellCheckPlainTextEdit(QPlainTextEdit):
             )
             menu.addAction(add_action)
 
-            menu.exec_(self.mapToGlobal(point))
+            menu.exec(self.mapToGlobal(point))
 
     def replace_word(self, cursor: QTextCursor, suggestion: str):
         original = cursor.selectedText()
@@ -107,8 +97,7 @@ class SpellCheckPlainTextEdit(QPlainTextEdit):
         cursor.endEditBlock()
 
     def add_to_custom_dictionary(self, word):
-        path = externalPath("data/dicionario_personalizado.txt")
-        # word = word.lower()
+        path = external_path("data/dicionario_personalizado.txt")
 
         with open(path, "r", encoding="utf-8") as f:
             words = {line.strip() for line in f if line.strip()}
@@ -118,4 +107,4 @@ class SpellCheckPlainTextEdit(QPlainTextEdit):
                 file.write(f"{word}\n")
 
         self.load_personal_dict(path)
-        self.highlighter.checkText(self.toPlainText())
+        self.highlighter.check_text(self.toPlainText())

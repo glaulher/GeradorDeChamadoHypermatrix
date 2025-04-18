@@ -4,9 +4,7 @@ import json
 import pyperclip
 
 
-def gerar_payload_e_output(
-    payload_dict: dict, output_file: str = "payload.json"
-) -> str:
+def payload_and_output(payload_dict: dict, output_file: str = "payload.json") -> str:
 
     # Sanitiza os dados
     for k in payload_dict:
@@ -31,7 +29,7 @@ def gerar_payload_e_output(
 
     caller_filename = inspect.stack()[1].filename
 
-    if "controle_pim_window.py" in caller_filename:
+    if "control_pim_window.py" in caller_filename:
         pyperclip.copy("\t".join(v for k, v in payload_dict.items() if k != "Assunto"))
     else:
         pyperclip.copy(output_str)

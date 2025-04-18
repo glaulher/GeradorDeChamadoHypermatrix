@@ -7,19 +7,19 @@ from email.mime.text import MIMEText
 
 import jinja2
 
-from utils.resource import internalPath, loadEnvFile
+from utils.resource import internal_path, load_env_file
 
-loadEnvFile()
+load_env_file()
 
 
 def send_mail(email_data):
 
-    with open(internalPath("data/recipients.json"), "r", encoding="utf-8") as file:
+    with open(internal_path("data/recipients.json"), "r", encoding="utf-8") as file:
         people_data = json.load(file)
 
     file_path_list = [{"name": "payload.json", "path": "payload.json"}]
 
-    with open(internalPath("ui/email_chamados.html"), "r", encoding="utf-8") as file:
+    with open(internal_path("ui/email_chamados.html"), "r", encoding="utf-8") as file:
         template_str = file.read()
 
     jinja_template = jinja2.Template(template_str)

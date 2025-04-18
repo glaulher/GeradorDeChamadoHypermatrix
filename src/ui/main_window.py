@@ -11,11 +11,11 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from ui.controle_pim_window import WindowControlePIM
+from ui.control_pim_window import WindowControlPIM
 from ui.dsoc_window import WindowDSOC
 from ui.main_building_window import WindowMB
 from ui.main_sites_window import WindowMS
-from utils.resource import internalPath
+from utils.resource import internal_path
 
 
 class MainWindow(QMainWindow):
@@ -23,11 +23,11 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("Gerador de Chamados")
         self.resize(1024, 768)
-        self.setWindowIcon(QIcon(internalPath("assets/logo_small.ico")))
+        self.setWindowIcon(QIcon(internal_path("assets/logo_small.ico")))
 
         # Sidebar
         self.sidebar = QWidget()
-        with open(internalPath("styles/sidebar.qss"), "r", encoding="utf-8") as f:
+        with open(internal_path("styles/sidebar.qss"), "r", encoding="utf-8") as f:
             self.sidebar.setStyleSheet(f.read())
         self.sidebar.setObjectName("sidebar")
         self.sidebar_layout = QVBoxLayout()
@@ -36,7 +36,7 @@ class MainWindow(QMainWindow):
 
         # Stacked content
         self.stack = QStackedWidget()
-        self.pages = [WindowControlePIM(), WindowDSOC(), WindowMB(), WindowMS()]
+        self.pages = [WindowControlPIM(), WindowDSOC(), WindowMB(), WindowMS()]
 
         for page in self.pages:
             self.stack.addWidget(page)

@@ -20,10 +20,10 @@ class HourWidget(QWidget):
         self.layout.setContentsMargins(0, 0, 0, 0)
 
     def atualizar_horario(self):
-        self.line_edit.set_text(datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S"))
+        self.line_edit.setText(datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S"))
 
     def text(self):
         return self.line_edit.text()
 
     def set_text(self, value: str):
-        self.line_edit.set_text(value)
+        self.line_edit.setText(value)

@@ -30,11 +30,16 @@ from PySide6.QtWidgets import QApplication
 
 from ui.main_window import MainWindow
 from utils.resource import internal_path
+from utils.theme_config import load_theme_name
+
+theme_name = load_theme_name()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+
     with open(internal_path("styles/ui.qss"), "r", encoding="utf-8") as f:
         app.setStyleSheet(f.read())
+
     window = MainWindow()
     window.show()
     sys.exit(app.exec())

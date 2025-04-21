@@ -3,7 +3,9 @@ from functools import partial
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QButtonGroup,
+    QComboBox,
     QHBoxLayout,
+    QLabel,
     QMainWindow,
     QPushButton,
     QStackedWidget,
@@ -15,7 +17,9 @@ from ui.control_pim_window import WindowControlPIM
 from ui.dsoc_window import WindowDSOC
 from ui.main_building_window import WindowMB
 from ui.main_sites_window import WindowMS
+from utils.logger import logger
 from utils.resource import internal_path
+from utils.theme_config import load_theme_name, save_theme_name
 
 
 class MainWindow(QMainWindow):
@@ -62,6 +66,20 @@ class MainWindow(QMainWindow):
 
         self.sidebar_layout.addStretch()
 
+        self.theme_label = QLabel("Tema:")
+        self.theme_label.setObjectName("sidebarLabel")
+
+        self.theme_selector = QComboBox()
+        self.theme_selector.addItems(["System", "Light", "Dark"])
+        self.theme_selector.currentTextChanged.connect(self.change_theme)
+
+        self.sidebar_layout.addWidget(self.theme_label)
+        self.sidebar_layout.addWidget(self.theme_selector)
+
+        load_theme = load_theme_name()
+
+        self.theme_selector.setCurrentText(load_theme)
+
         # Layout principal
         central_widget = QWidget()
         main_layout = QHBoxLayout()
@@ -76,3 +94,19 @@ class MainWindow(QMainWindow):
     def set_active(self, index):
         self.sidebar_buttons[index].setChecked(True)
         self.stack.setCurrentIndex(index)
+
+    def change_theme(self, theme_name):
+        self.setStyleSheet("")
+        save_theme_name(theme_name)
+
+        path = internal_path(f"styles/{theme_name}.qss")
+
+        if theme_name not in ["Light", "Dark"]:
+            self.setStyleSheet("")
+            return
+
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                self.setStyleSheet(f.read())
+        except FileNotFoundError:
+            logger.error("Arquivo de estilo não encontrado: %s", path)

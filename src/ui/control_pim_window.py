@@ -17,7 +17,7 @@ from services.email_service import send_mail
 from services.lookup_service import fetch_datalookup
 from services.weather_service import get_weather_data
 from ui.widgets.combobox_options import load_combobox_options
-from ui.widgets.dialogs import show_confirmation_dialog
+from ui.widgets.confirmation_dialog import show_confirmation_dialog
 from ui.widgets.operator_combobox import OperatorComboBox
 from ui.widgets.spell_check_plain_text_edit import SpellCheckPlainTextEdit
 from ui.widgets.uppercase_line_edit import UpperCaseLineEdit
@@ -147,10 +147,11 @@ class WindowControlPIM(QDialog):
 
         output_str = payload_and_output(payload)
 
-        confirmed = show_confirmation_dialog(
-            f"Favor verificar se o chamado está correto:\n\n{output_str}\n\nConfirma o envio do email?",
-            title="Chamado Gerado:",
-        )
+        # confirmed = show_confirmation_dialog(
+        #     f"Favor verificar se o chamado está correto:\n\n{output_str}\n\nConfirma o envio do email?",
+        #     title="Chamado Gerado:",
+        # )
+        confirmed = show_confirmation_dialog(f"{output_str}", title="Chamado Gerado")
 
         if confirmed:
             email_data = {

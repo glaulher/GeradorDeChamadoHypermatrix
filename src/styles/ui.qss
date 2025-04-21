@@ -1,9 +1,9 @@
 QLabel {
   font-size: 15px;
   font-family: "Segoe UI", sans-serif;
-  font-weight: 400;
+  font-weight: 500;
 }
-QComboBox, QLineEdit, QPlainTextEdit,QGroupBox {
+QComboBox, QLineEdit, QPlainTextEdit,QAbstractItemView {
   font-size: 16px;
   font-family: "Segoe UI", sans-serif;
 }
@@ -11,5 +11,25 @@ QComboBox, QLineEdit, QPlainTextEdit,QGroupBox {
 QGroupBox {
   font-size: 16px;
   font-family: "Segoe UI", sans-serif;
-  font-weight: 500;
+  font-weight: 600;
 }
+
+QPushButton#btnRefresh {                
+  min-width: 0px;
+  max-width: 30px;
+  min-height: 0px;
+  max-height: 30px;                
+  padding: 0px;
+  margin: 0px;
+  border: none;
+  font-size: 28px;                
+}
+
+QPushButton:hover#btnRefresh {
+  background-color: rgba(176, 199, 229, 120);
+}
+
+QPushButton:pressed#btnRefresh {
+  background-color: #1cc1a0;
+}
+

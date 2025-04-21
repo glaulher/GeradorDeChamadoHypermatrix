@@ -1,0 +1,77 @@
+QMainWindow,QDialog {
+  background-color: #f3f3f3f3;
+  color: #232629;
+}
+
+QGroupBox {              
+  
+  margin-top: 10px;
+  padding-top:12px;                 
+  
+  border-width: 1px;
+  border-color:#232629;
+  border-style: solid;
+  border-radius: 5px;         
+  
+  color: #232629;  
+  background-color: #f3f3f3f3              
+}
+
+QGroupBox::title {                
+  subcontrol-origin: margin;
+  subcontrol-position: top center ;  
+  
+  background-color: #f3f3f3f3         
+}
+
+QLabel#sidebarLabel {                
+  color: #eff0f1;                
+}
+
+QLabel, QCheckBox {
+  color: #232629;
+}
+
+QLineEdit, QTextEdit, QComboBox,QPlainTextEdit {
+  background-color: #ffffff;
+  color: #232629;
+  border: 1px solid #c0c0c0;
+  border-radius: 4px;
+  padding: 3px;
+}
+
+QPushButton {
+  background-color: #e1eaf4;
+  color: #232629;
+  border: 1px solid #b0c4d6;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  min-width: 120px; 
+  min-width: 80px;       
+
+}
+
+QPushButton:hover {
+  background-color: #d4e0ed;
+} 
+
+QPushButton#btnRefresh {                
+  min-width: 0px;
+  max-width: 30px;
+  min-height: 0px;
+  max-height: 30px;                
+  padding: 0px;
+  margin: 0px;
+  border: none;
+  font-size: 28px;                
+}
+
+QPushButton:hover#btnRefresh {
+  background-color: rgba(176, 199, 229, 120);
+} 
+
+QPushButton:pressed#btnRefresh {
+  background-color: #1cc1a0;
+}

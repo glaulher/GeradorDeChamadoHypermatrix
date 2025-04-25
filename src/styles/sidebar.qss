@@ -25,3 +25,7 @@ QPushButton:pressed {
   background-color: #1cc1a0;
 }
 
+QLabel#sidebarLabel {                
+  color: #eff0f1;                
+}
+

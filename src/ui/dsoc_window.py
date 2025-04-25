@@ -4,6 +4,7 @@ from PySide6.QtWidgets import (
     QDialogButtonBox,
     QFormLayout,
     QGroupBox,
+    QLabel,
     QMessageBox,
     QVBoxLayout,
 )
@@ -34,6 +35,8 @@ class WindowDSOC(QDialog):
         self.alarm_type_combobox = QComboBox()
         self.gravity_combobox = QComboBox()
         self.ne_name_line_edit = UpperCaseLineEdit()
+        self.ne_name_line_edit.focused.connect(self.on_site_id_focus)
+
         self.update_plain_text = SpellCheckPlainTextEdit()
 
         load_combobox_options(self.motivation_combobox, "motivacao")
@@ -44,10 +47,19 @@ class WindowDSOC(QDialog):
         self.buttonbox = QDialogButtonBox(QDialogButtonBox.Ok)
         self.buttonbox.accepted.connect(self.get_info)
 
+        self.success_label = QLabel("✅ E-mail enviado! Texto copiado!")
+        self.success_label.setStyleSheet("color: green; font-weight: bold;")
+        self.success_label.hide()
+
         sublayout = QVBoxLayout()
         sublayout.addWidget(self.form_groupbox)
+        sublayout.addWidget(self.success_label)
         sublayout.addWidget(self.buttonbox)
         self.setLayout(sublayout)
+
+    def on_site_id_focus(self):
+        self.success_label.hide()
+        self.ne_name_line_edit.clear()
 
     def get_info(self):
         ne_name = self.ne_name_line_edit.text()
@@ -79,8 +91,7 @@ class WindowDSOC(QDialog):
         output_str = payload_and_output(payload)
 
         confirmed = show_confirmation_dialog(
-            f"Favor verificar se o chamado está correto:\n\n{output_str}\n\nConfirma o envio do email?",
-            title="Chamado Gerado:",
+            f"{output_str}", title="Chamado Gerado", parent=self
         )
 
         if confirmed:
@@ -95,12 +106,8 @@ class WindowDSOC(QDialog):
             }
             try:
                 send_mail(email_data)
+                self.success_label.show()
 
-                QMessageBox.information(
-                    self,
-                    "Sucesso",
-                    "✅ E-mail enviado com sucesso!\n📋 Texto copiado para o clipboard.",
-                )
             except Exception as e:  # pylint: disable=broad-exception-caught
                 QMessageBox.critical(
                     self,
@@ -111,9 +118,8 @@ class WindowDSOC(QDialog):
                     ),
                 )
         else:
-            QMessageBox.information(
-                self, "Sucesso", "✅ Texto copiado para o clipboard."
-            )
+            self.success_label.setText("✅ Texto copiado!")
+            self.success_label.show()
 
     def create_form(self):
         layout = QFormLayout()

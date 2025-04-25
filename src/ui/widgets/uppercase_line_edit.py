@@ -1,7 +1,10 @@
+from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QLineEdit
 
 
 class UpperCaseLineEdit(QLineEdit):
+    focused = Signal()
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.textChanged.connect(self.to_upper)
@@ -12,3 +15,10 @@ class UpperCaseLineEdit(QLineEdit):
         self.setText(text.upper())
         self.setCursorPosition(cursor)
         self.blockSignals(False)
+
+    # def focusInEvent(self, event):  # pylint: disable=invalid-name
+    # super().focusInEvent(event)
+    def mousePressEvent(self, event):
+        self.clear()
+        self.focused.emit()
+        super().mousePressEvent(event)

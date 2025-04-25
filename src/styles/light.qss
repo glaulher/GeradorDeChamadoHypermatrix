@@ -24,10 +24,6 @@ QGroupBox::title {
   background-color: #f3f3f3f3         
 }
 
-QLabel#sidebarLabel {                
-  color: #eff0f1;                
-}
-
 QLabel, QCheckBox {
   color: #232629;
 }
@@ -74,4 +70,19 @@ QPushButton:hover#btnRefresh {
 
 QPushButton:pressed#btnRefresh {
   background-color: #1cc1a0;
+}
+
+QPushButton#button_dialog {        
+  padding: 8px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+QAbstractItemView {
+  background-color: #ffffff;
+  color: #232629;
+  selection-background-color: #d4e0ed;
+  selection-color: #000000;
+  border: 1px solid #c0c0c0;
+  outline: none;
 }

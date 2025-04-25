@@ -9,6 +9,8 @@ from PySide6.QtWidgets import (
     QDialogButtonBox,
     QFormLayout,
     QGroupBox,
+    QLabel,
+    QLineEdit,
     QMessageBox,
     QVBoxLayout,
 )
@@ -17,7 +19,7 @@ from services.email_service import send_mail
 from services.lookup_service import fetch_datalookup
 from services.weather_service import get_weather_data
 from ui.widgets.combobox_options import load_combobox_options
-from ui.widgets.confirmation_dialog import show_confirmation_dialog
+from ui.widgets.dialogs import show_confirmation_dialog
 from ui.widgets.operator_combobox import OperatorComboBox
 from ui.widgets.spell_check_plain_text_edit import SpellCheckPlainTextEdit
 from ui.widgets.uppercase_line_edit import UpperCaseLineEdit
@@ -38,7 +40,9 @@ class WindowControlPIM(QDialog):
 
         self.operator_combobox = OperatorComboBox()
 
-        self.end_id_line_edit = UpperCaseLineEdit()
+        self.site_id_line_edit = UpperCaseLineEdit()
+        self.site_id_line_edit.focused.connect(self.on_site_id_focus)
+
         self.alarm_type_combobox = QComboBox()
         self.netcool_combobox = QComboBox()
         self.servicenow_combobox = QComboBox()
@@ -46,6 +50,7 @@ class WindowControlPIM(QDialog):
         self.event_combobox = QComboBox()
         self.event_number_line_edit = UpperCaseLineEdit()
         self.update_plain_text = SpellCheckPlainTextEdit()
+        self.link_line_edit = QLineEdit()
 
         self.war_room_combobox = QComboBox()
         self.unavailability_combobox = QComboBox()
@@ -83,20 +88,41 @@ class WindowControlPIM(QDialog):
         self.buttonbox = QDialogButtonBox(QDialogButtonBox.Ok)
         self.buttonbox.accepted.connect(self.get_info)
 
+        self.success_label = QLabel("✅ E-mail enviado! Texto copiado!")
+        self.success_label.setStyleSheet("color: green; font-weight: bold;")
+        self.success_label.hide()
+
         sublayout = QVBoxLayout()
         sublayout.addWidget(self.form_groupbox)
+        sublayout.addWidget(self.success_label)
         sublayout.addWidget(self.buttonbox)
         self.setLayout(sublayout)
 
+    def on_site_id_focus(self):
+        self.success_label.hide()
+        self.site_id_line_edit.clear()
+
     def get_info(self):
-        end_id = self.end_id_line_edit.text()
-        if fetch_datalookup("END_ID", end_id, "CLASSIFICAÇÃO") is None:
-            QMessageBox.information(self, "Aviso", f"END_ID: {end_id} não encontrado")
+        site_id = self.site_id_line_edit.text()
+        if len(site_id) == 7:
+            site_name = "NE_NAME"
+            if fetch_datalookup("NE_NAME", site_id, "CLASSIFICAÇÃO") is None:
+                QMessageBox.information(
+                    self, "Aviso", f"NE_NAME: {site_id} não encontrado"
+                )
 
-            return
+                return
+        else:
+            site_name = "END_ID"
+            if fetch_datalookup("END_ID", site_id, "CLASSIFICAÇÃO") is None:
+                QMessageBox.information(
+                    self, "Aviso", f"END_ID: {site_id} não encontrado"
+                )
 
-        latitude = fetch_datalookup("END_ID", end_id, "latitude").replace(",", ".")
-        longitude = fetch_datalookup("END_ID", end_id, "longitude").replace(",", ".")
+                return
+
+        latitude = fetch_datalookup(site_name, site_id, "latitude").replace(",", ".")
+        longitude = fetch_datalookup(site_name, site_id, "longitude").replace(",", ".")
 
         try:
             weather_data = get_weather_data(latitude, longitude)
@@ -111,15 +137,30 @@ class WindowControlPIM(QDialog):
 
         weather = weather_data.get("current", {})
 
+        if len(site_id) == 7:
+            # Case NE_NAME
+            actual_end_id = fetch_datalookup("NE_NAME", site_id, "END_ID")
+            ne_name = site_id
+            classificacao = fetch_datalookup("NE_NAME", site_id, "CLASSIFICAÇÃO")
+            topologia = fetch_datalookup("NE_NAME", site_id, "SUBCLASS")
+            regional = fetch_datalookup("NE_NAME", site_id, "REGIONAL")
+        else:
+            # Case END_ID
+            actual_end_id = site_id
+            ne_name = fetch_datalookup("END_ID", site_id, "NE NAME")
+            classificacao = fetch_datalookup("END_ID", site_id, "CLASSIFICAÇÃO")
+            topologia = fetch_datalookup("END_ID", site_id, "SUBCLASS")
+            regional = fetch_datalookup("END_ID", site_id, "REGIONAL")
+
         payload = {
             "Assunto": "Abertura de chamado. Controle PIM",
             "OPERADOR": self.operator_combobox.currentText(),
             "DATA EVENTO": str(datetime.date.today()),
-            "END_ID": end_id,
-            "NE_NAME": fetch_datalookup("END_ID", end_id, "NE NAME"),
-            "CLASSIFICAÇÃO": fetch_datalookup("END_ID", end_id, "CLASSIFICAÇÃO"),
-            "TOPOLOGIA": fetch_datalookup("END_ID", end_id, "SUBCLASS"),
-            "REGIONAL": fetch_datalookup("END_ID", end_id, "REGIONAL"),
+            "END_ID": actual_end_id,
+            "NE_NAME": ne_name,
+            "CLASSIFICAÇÃO": classificacao,
+            "TOPOLOGIA": topologia,
+            "REGIONAL": regional,
             "TIPO DO EVENTO": self.alarm_type_combobox.currentText(),
             "ALARMOU NO NETCOOL": self.netcool_combobox.currentText(),
             "ALARMOU NO SERVICENOW": self.servicenow_combobox.currentText(),
@@ -127,6 +168,7 @@ class WindowControlPIM(QDialog):
             "DESCRICAO EVENTO": self.event_combobox.currentText(),
             "NUMERO EVENTO": self.event_number_line_edit.text(),
             "OBSERVACOES/RECOMENDACOES": self.update_plain_text.toPlainText(),
+            "Link": self.link_line_edit.text(),
             "SALA DE CRISE?": self.war_room_combobox.currentText(),
             "DESSERVICO?": self.unavailability_combobox.currentText(),
             "Owner TIM acionado?": self.ownertim_triggered_combobox.currentText(),
@@ -147,11 +189,9 @@ class WindowControlPIM(QDialog):
 
         output_str = payload_and_output(payload)
 
-        # confirmed = show_confirmation_dialog(
-        #     f"Favor verificar se o chamado está correto:\n\n{output_str}\n\nConfirma o envio do email?",
-        #     title="Chamado Gerado:",
-        # )
-        confirmed = show_confirmation_dialog(f"{output_str}", title="Chamado Gerado")
+        confirmed = show_confirmation_dialog(
+            f"{output_str}", title="Chamado Gerado", parent=self
+        )
 
         if confirmed:
             email_data = {
@@ -165,12 +205,8 @@ class WindowControlPIM(QDialog):
             }
             try:
                 send_mail(email_data)
+                self.success_label.show()
 
-                QMessageBox.information(
-                    self,
-                    "Sucesso",
-                    "✅ E-mail enviado com sucesso!\n📋 Texto copiado para o clipboard.",
-                )
             except Exception as e:  # pylint: disable=broad-exception-caught
                 QMessageBox.critical(
                     self,
@@ -181,14 +217,13 @@ class WindowControlPIM(QDialog):
                     ),
                 )
         else:
-            QMessageBox.information(
-                self, "Sucesso", "✅ Texto copiado para o clipboard."
-            )
+            self.success_label.setText("✅ Texto copiado!")
+            self.success_label.show()
 
     def create_form(self):
         layout = QFormLayout()
         layout.addRow("Operador", self.operator_combobox)
-        layout.addRow("END_ID", self.end_id_line_edit)
+        layout.addRow("End Id ou Ne Name", self.site_id_line_edit)
         layout.addRow("Tipo de Evento", self.alarm_type_combobox)
         layout.addRow("Alarmou no NetCool", self.netcool_combobox)
         layout.addRow("Alarmou no ServiceNow", self.servicenow_combobox)
@@ -196,6 +231,7 @@ class WindowControlPIM(QDialog):
         layout.addRow("Descrição do evento", self.event_combobox)
         layout.addRow("Número do evento", self.event_number_line_edit)
         layout.addRow("Observações / Recomendações", self.update_plain_text)
+        layout.addRow("Link do gráfico", self.link_line_edit)
         layout.addRow("Sala de crise?", self.war_room_combobox)
         layout.addRow("Desserviço?", self.unavailability_combobox)
         layout.addRow("OwnerTim acionado?", self.ownertim_triggered_combobox)

@@ -71,3 +71,18 @@ QPushButton:hover#btnRefresh {
 QPushButton:pressed#btnRefresh {
   background-color: #1cc1a0;
 }
+
+QPushButton#button_dialog {        
+  padding: 8px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+QAbstractItemView {
+  background-color: #3b3b3b;
+  color: #eff0f1;
+  selection-background-color: #555555;
+  selection-color: #ffffff;
+  border: 1px solid #5c5c5c;
+  outline: none;
+}

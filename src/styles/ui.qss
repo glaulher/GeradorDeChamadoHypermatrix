@@ -3,6 +3,7 @@ QLabel {
   font-family: "Segoe UI", sans-serif;
   font-weight: 500;
 }
+
 QComboBox, QLineEdit, QPlainTextEdit,QAbstractItemView {
   font-size: 16px;
   font-family: "Segoe UI", sans-serif;
@@ -12,6 +13,35 @@ QGroupBox {
   font-size: 16px;
   font-family: "Segoe UI", sans-serif;
   font-weight: 600;
+
+  margin-top: 10px;
+  padding-top: 12px;
+}
+
+QGroupBox::title {
+  subcontrol-origin: margin;
+  subcontrol-position: top center;
+}
+
+QPushButton {
+  padding: 4px 8px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  min-width: 80px;
+  border: 1px solid #b0c4d6;
+  border-radius: 6px;
+}
+
+QPlainTextEdit#text_dialog {            
+  font-family: Consolas, monospace;
+  font-size: 14px;
+  border: 1px solid #b0c4d6;
+}
+
+QPushButton#button_dialog {        
+  padding: 8px;
+  border-radius: 4px;
+  font-weight: bold;
 }
 
 QPushButton#btnRefresh {                
@@ -25,11 +55,23 @@ QPushButton#btnRefresh {
   font-size: 28px;                
 }
 
-QPushButton:hover#btnRefresh {
+QPushButton:hover {
   background-color: rgba(176, 199, 229, 120);
 }
 
 QPushButton:pressed#btnRefresh {
   background-color: #1cc1a0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
 

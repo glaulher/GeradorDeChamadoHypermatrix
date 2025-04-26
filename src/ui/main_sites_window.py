@@ -1,12 +1,13 @@
+from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import (
     QComboBox,
-    QDialog,
     QDialogButtonBox,
     QFormLayout,
     QGroupBox,
     QLabel,
     QMessageBox,
     QVBoxLayout,
+    QWidget,
 )
 
 from services.email_service import send_mail
@@ -21,7 +22,7 @@ from utils.datetime_utils import get_greeting
 from utils.payload_utils import payload_and_output
 
 
-class WindowMS(QDialog):
+class WindowMS(QWidget):
     def __init__(self):
         super(WindowMS, self).__init__()
         self.setWindowTitle("Gerador de chamados MAIN SITES")
@@ -38,8 +39,6 @@ class WindowMS(QDialog):
         self.tskeve_line_edit = UpperCaseLineEdit()
         self.update_plain_text = SpellCheckPlainTextEdit()
 
-        load_combobox_options(self.alarm_type_combobox, "tipo_de_alarme")
-
         self.create_form()
         self.button_box = QDialogButtonBox(QDialogButtonBox.Ok)
         self.button_box.accepted.connect(self.get_info)
@@ -53,6 +52,12 @@ class WindowMS(QDialog):
         sublayout.addWidget(self.success_label)
         sublayout.addWidget(self.button_box)
         self.setLayout(sublayout)
+
+        # Lazy load
+        QTimer.singleShot(0, self.load_date)
+
+    def load_date(self):
+        load_combobox_options(self.alarm_type_combobox, "tipo_de_alarme")
 
     def on_site_id_focus(self):
         self.success_label.hide()

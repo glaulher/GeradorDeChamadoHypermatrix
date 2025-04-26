@@ -1,11 +1,10 @@
 import datetime
 import json
 
-from PySide6.QtCore import QStringListModel, Qt
+from PySide6.QtCore import QStringListModel, Qt, QTimer
 from PySide6.QtWidgets import (
     QComboBox,
     QCompleter,
-    QDialog,
     QDialogButtonBox,
     QFormLayout,
     QGroupBox,
@@ -13,6 +12,7 @@ from PySide6.QtWidgets import (
     QLineEdit,
     QMessageBox,
     QVBoxLayout,
+    QWidget,
 )
 
 from services.email_service import send_mail
@@ -27,11 +27,8 @@ from utils.datetime_utils import get_greeting
 from utils.payload_utils import payload_and_output
 from utils.resource import external_path
 
-with open(external_path("data/combobox_options.json"), "r", encoding="utf-8") as file:
-    combobox_options = json.load(file)
 
-
-class WindowControlPIM(QDialog):
+class WindowControlPIM(QWidget):
     def __init__(self):
         super(WindowControlPIM, self).__init__()
         self.setWindowTitle("Gerador de texto")
@@ -60,9 +57,33 @@ class WindowControlPIM(QDialog):
         self.owner_name_combobox.setEditable(True)
         self.owner_name_combobox.setInsertPolicy(QComboBox.NoInsert)
 
+        # Lazy load
+        QTimer.singleShot(0, self.load_date)
+
+        self.create_form()
+        self.buttonbox = QDialogButtonBox(QDialogButtonBox.Ok)
+        self.buttonbox.accepted.connect(self.get_info)
+
+        self.success_label = QLabel("✅ E-mail enviado! Texto copiado!")
+        self.success_label.setStyleSheet("color: green; font-weight: bold;")
+        self.success_label.hide()
+
+        sublayout = QVBoxLayout()
+        sublayout.addWidget(self.form_groupbox)
+        sublayout.addWidget(self.success_label)
+        sublayout.addWidget(self.buttonbox)
+        self.setLayout(sublayout)
+
+    def load_date(self):
+        with open(
+            external_path("data/combobox_options.json"), "r", encoding="utf-8"
+        ) as file:
+            combobox_options = json.load(file)
+
         nome_owner_list = sorted(
             set([item.strip() for item in combobox_options["nome_owner"]])
         )
+
         nome_owner_model = QStringListModel(nome_owner_list)
 
         self.owner_name_combobox.addItems(nome_owner_list)
@@ -83,20 +104,6 @@ class WindowControlPIM(QDialog):
         load_combobox_options(self.war_room_combobox, "sala_de_crise")
         load_combobox_options(self.unavailability_combobox, "desservico")
         load_combobox_options(self.ownertim_triggered_combobox, "ownertim_acionado")
-
-        self.create_form()
-        self.buttonbox = QDialogButtonBox(QDialogButtonBox.Ok)
-        self.buttonbox.accepted.connect(self.get_info)
-
-        self.success_label = QLabel("✅ E-mail enviado! Texto copiado!")
-        self.success_label.setStyleSheet("color: green; font-weight: bold;")
-        self.success_label.hide()
-
-        sublayout = QVBoxLayout()
-        sublayout.addWidget(self.form_groupbox)
-        sublayout.addWidget(self.success_label)
-        sublayout.addWidget(self.buttonbox)
-        self.setLayout(sublayout)
 
     def on_site_id_focus(self):
         self.success_label.hide()

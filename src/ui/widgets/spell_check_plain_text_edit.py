@@ -1,7 +1,7 @@
 import json
 import os
 
-from PySide6.QtCore import QPoint, Qt
+from PySide6.QtCore import QPoint, Qt, QTimer
 from PySide6.QtGui import QAction, QTextCursor
 from PySide6.QtWidgets import QMenu, QPlainTextEdit
 
@@ -14,35 +14,36 @@ class SpellCheckPlainTextEdit(QPlainTextEdit):
     def __init__(self):
         super().__init__()
 
+        # Inicialização
         self.spell = SpellChecker(language="pt")
         self.highlighter = SpellHighlighter(self.document())
-        self.load_personal_dict(external_path("data/dicionario_personalizado.txt"))
+        self.custom_corrections = {}
 
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.show_spellcheck_menu)
 
-        with open(
-            external_path("data/correcoes_personalizadas.json"), "r", encoding="utf-8"
-        ) as file:
-            self.custom_corrections = json.load(file)
+        # Lazy load
+        QTimer.singleShot(0, self.load_date)
+
+        self.load_personal_dict(external_path("data/dicionario_personalizado.txt"))
+
+    def load_date(self):
+        self.load_custom_corrections()
+
+    def load_custom_corrections(self):
+        path = external_path("data/correcoes_personalizadas.json")
+        if os.path.exists(path):
+            with open(path, "r", encoding="utf-8") as file:
+                self.custom_corrections = json.load(file)
 
     def load_personal_dict(self, path):
         if os.path.exists(path):
             with open(path, "r", encoding="utf-8") as f:
                 words = [line.strip() for line in f if line.strip()]
-
-                self.spell = SpellChecker(language="pt")
                 self.spell.word_frequency.load_words([w.lower() for w in words])
                 self.highlighter.sensitive_words = set(words)
-
                 self.highlighter.spell = self.spell
                 self.highlighter.rehighlight()
-
-    def load_custom_corrections(self, path):
-        if os.path.exists(path):
-            with open(path, "r", encoding="utf-8") as f:
-                return json.load(f)
-        return {}
 
     def show_spellcheck_menu(self, point: QPoint):
         cursor = self.cursorForPosition(point)

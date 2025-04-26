@@ -1,6 +1,6 @@
 import json
 
-from PySide6.QtCore import QStringListModel, Qt
+from PySide6.QtCore import QStringListModel, Qt, QTimer
 from PySide6.QtWidgets import QComboBox, QCompleter
 
 from utils.resource import external_path
@@ -12,6 +12,10 @@ class OperatorComboBox(QComboBox):
         self.setEditable(True)
         self.setInsertPolicy(QComboBox.NoInsert)
 
+        # Lazy load
+        QTimer.singleShot(0, self.load_date)
+
+    def load_date(self):
         with open(
             external_path("data/combobox_options.json"), "r", encoding="utf-8"
         ) as file:

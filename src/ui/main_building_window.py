@@ -1,6 +1,6 @@
+from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import (
     QComboBox,
-    QDialog,
     QDialogButtonBox,
     QFormLayout,
     QGroupBox,
@@ -8,6 +8,7 @@ from PySide6.QtWidgets import (
     QLineEdit,
     QMessageBox,
     QVBoxLayout,
+    QWidget,
 )
 
 from services.diesel_service import DieselDataError, get_diesel_data
@@ -23,7 +24,7 @@ from utils.datetime_utils import get_greeting
 from utils.payload_utils import payload_and_output
 
 
-class WindowMB(QDialog):
+class WindowMB(QWidget):
     def __init__(self):
         super(WindowMB, self).__init__()
         self.setWindowTitle("Gerador de chamados MAIN BUILDING")
@@ -46,9 +47,6 @@ class WindowMB(QDialog):
 
         self.ne_name_line_edit.textChanged.connect(self.on_ne_name_changed)
 
-        load_combobox_options(self.alarm_type_combobox, "tipo_de_alarme")
-        load_combobox_options(self.gmg_monitor_combobox, "gmg_monitorado")
-
         self.create_form()
         self.buttonbox = QDialogButtonBox(QDialogButtonBox.Ok)
         self.buttonbox.accepted.connect(self.get_info)
@@ -62,6 +60,13 @@ class WindowMB(QDialog):
         sublayout.addWidget(self.success_label)
         sublayout.addWidget(self.buttonbox)
         self.setLayout(sublayout)
+
+        # Lazy load
+        QTimer.singleShot(0, self.load_date)
+
+    def load_date(self):
+        load_combobox_options(self.alarm_type_combobox, "tipo_de_alarme")
+        load_combobox_options(self.gmg_monitor_combobox, "gmg_monitorado")
 
     def on_ne_name_changed(self, text):
         if len(text.strip()) == 7:

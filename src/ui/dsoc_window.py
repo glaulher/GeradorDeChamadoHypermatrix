@@ -1,12 +1,13 @@
+from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import (
     QComboBox,
-    QDialog,
     QDialogButtonBox,
     QFormLayout,
     QGroupBox,
     QLabel,
     QMessageBox,
     QVBoxLayout,
+    QWidget,
 )
 
 from services.email_service import send_mail
@@ -21,7 +22,7 @@ from utils.datetime_utils import get_greeting
 from utils.payload_utils import payload_and_output
 
 
-class WindowDSOC(QDialog):
+class WindowDSOC(QWidget):
     def __init__(self):
         super(WindowDSOC, self).__init__()
         self.setWindowTitle("Gerador de chamados DSOC")
@@ -39,10 +40,6 @@ class WindowDSOC(QDialog):
 
         self.update_plain_text = SpellCheckPlainTextEdit()
 
-        load_combobox_options(self.motivation_combobox, "motivacao")
-        load_combobox_options(self.alarm_type_combobox, "tipo_de_alarme")
-        load_combobox_options(self.gravity_combobox, "gravidade")
-
         self.create_form()
         self.buttonbox = QDialogButtonBox(QDialogButtonBox.Ok)
         self.buttonbox.accepted.connect(self.get_info)
@@ -56,6 +53,14 @@ class WindowDSOC(QDialog):
         sublayout.addWidget(self.success_label)
         sublayout.addWidget(self.buttonbox)
         self.setLayout(sublayout)
+
+        # Lazy load
+        QTimer.singleShot(0, self.load_date)
+
+    def load_date(self):
+        load_combobox_options(self.motivation_combobox, "motivacao")
+        load_combobox_options(self.alarm_type_combobox, "tipo_de_alarme")
+        load_combobox_options(self.gravity_combobox, "gravidade")
 
     def on_site_id_focus(self):
         self.success_label.hide()

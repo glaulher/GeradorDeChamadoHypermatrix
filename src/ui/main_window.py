@@ -17,6 +17,7 @@ from ui.control_pim_window import WindowControlPIM
 from ui.dsoc_window import WindowDSOC
 from ui.main_building_window import WindowMB
 from ui.main_sites_window import WindowMS
+from ui.window_site_info import WindowSiteInfo
 from utils.resource import internal_path
 from utils.theme_config import apply_theme, load_theme_name
 
@@ -39,7 +40,13 @@ class MainWindow(QMainWindow):
 
         # Stacked content
         self.stack = QStackedWidget()
-        self.pages = [WindowControlPIM(), WindowDSOC(), WindowMB(), WindowMS()]
+        self.pages = [
+            WindowControlPIM(),
+            WindowDSOC(),
+            WindowMB(),
+            WindowMS(),
+            WindowSiteInfo(),
+        ]
 
         for page in self.pages:
             self.stack.addWidget(page)
@@ -53,6 +60,7 @@ class MainWindow(QMainWindow):
             "Chamado DSOC",
             "Main Building",
             "Main Sites",
+            "Pesquisa",
         ]
 
         for index, text in enumerate(button_texts):

@@ -44,7 +44,7 @@ QPushButton#button_dialog {
   font-weight: bold;
 }
 
-QPushButton#btnRefresh {                
+QPushButton#btnRefreshHourAndSearch {                
   min-width: 0px;
   max-width: 30px;
   min-height: 0px;
@@ -59,7 +59,7 @@ QPushButton:hover {
   background-color: rgba(176, 199, 229, 120);
 }
 
-QPushButton:pressed#btnRefresh {
+QPushButton:pressed#btnRefreshHourAndSearch {
   background-color: #1cc1a0;
 }
 

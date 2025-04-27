@@ -1,7 +1,7 @@
 {
     "Assunto": "Abertura de chamado. Controle PIM",
     "OPERADOR": "",
-    "DATA EVENTO": "2025-04-25",
+    "DATA EVENTO": "2025-04-27",
     "END_ID": "CEJNE_0007",
     "NE_NAME": "PIJNE01",
     "CLASSIFICAÇÃO": "MAIN BUILDING",
@@ -24,11 +24,11 @@
     "QUAL ACAO A SER REALIZADA?(PREENCHIMENTO EQUIPE PREVENTIVA)": "",
     "STATUS ACAO(PREENCHIMENTO EQUIPE PREVENTIVA)": "",
     "TEMPO DE INTERRUPCAO AC(PREENCHIMENTO EQUIPE PREVENTIVA)": "",
-    "Hora do evento": "16:33:55",
+    "Hora do evento": "07:20:44",
     "Latitude": "-7.24419",
     "Longitude": "-39.30503",
-    "Temperatura externa (°C)": "29.5",
-    "Umidade (%)": "51",
-    "Velocidade do Vento (km/h)": "7.1",
+    "Temperatura externa (°C)": "23.9",
+    "Umidade (%)": "78",
+    "Velocidade do Vento (km/h)": "1.5",
     "Precipitação (mm)": "0.0"
 }

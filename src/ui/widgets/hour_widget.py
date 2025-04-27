@@ -12,7 +12,7 @@ class HourWidget(QWidget):
         )
 
         self.button = QPushButton("🔄")
-        self.button.setObjectName("btnRefresh")
+        self.button.setObjectName("btnRefreshHourAndSearch")
         self.button.clicked.connect(self.atualizar_horario)
 
         self.layout.addWidget(self.line_edit)

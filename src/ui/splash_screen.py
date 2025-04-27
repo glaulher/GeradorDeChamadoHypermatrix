@@ -35,7 +35,6 @@ class SplashScreen(QWidget):
         self.label.setStyleSheet("font-size: 14px; color: #cccccc;")
         self.label.setAlignment(Qt.AlignCenter)
 
-        # PROGRESSO
         self.progress = QProgressBar()
         self.progress.setRange(0, 100)
         self.progress.setValue(0)
@@ -69,7 +68,7 @@ class SplashScreen(QWidget):
         self._timer.start(30)
 
     def _update_progress(self):
-        self._step += 1
+        self._step += 3
         self.progress.setValue(self._step)
         if self._step >= 100:
             self._timer.stop()

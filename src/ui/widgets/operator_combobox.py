@@ -3,6 +3,7 @@ import json
 from PySide6.QtCore import QStringListModel, Qt, QTimer
 from PySide6.QtWidgets import QComboBox, QCompleter
 
+from utils.operator_config import load_operator_name
 from utils.resource import external_path
 
 
@@ -34,3 +35,7 @@ class OperatorComboBox(QComboBox):
         completer.setCaseSensitivity(Qt.CaseInsensitive)
 
         self.setCompleter(completer)
+
+        operator_save = load_operator_name()
+        if operator_save in operador_list:
+            self.setCurrentText(operator_save)

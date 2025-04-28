@@ -25,6 +25,17 @@ QPushButton:pressed {
   background-color: #1cc1a0;
 }
 
+QPushButton#btnRefreshOperator {
+  min-width: 30px;
+  max-width: 30px;
+  min-height: 30px;
+  max-height: 30px;
+  padding: 0px;
+  margin: 0px;
+  border: none;
+  font-size: 28px; 
+}
+
 QLabel#sidebarLabel {                
   color: #eff0f1;                
 }

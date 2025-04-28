@@ -5,6 +5,7 @@ from PySide6.QtWidgets import (
     QAbstractButton,
     QFormLayout,
     QGroupBox,
+    QHBoxLayout,
     QMessageBox,
     QTableWidget,
     QTableWidgetItem,
@@ -14,7 +15,8 @@ from PySide6.QtWidgets import (
 
 from services.get_main_build_info import BuildingDataError, get_main_build_info
 from services.get_main_site_info import MainSiteDataError, get_main_site_info
-from ui.widgets.search_widget import SearchWidget
+from ui.widgets.search_button import SearchButton
+from ui.widgets.uppercase_line_edit import UpperCaseLineEdit
 
 
 class WindowSiteInfo(QWidget):
@@ -24,9 +26,12 @@ class WindowSiteInfo(QWidget):
 
         self.form_groupbox = QGroupBox("Informações do Site")
 
-        self.search_widget = SearchWidget()
-        self.search_widget.return_pressed(self.fetch_info)
-        self.search_widget.clicked(self.fetch_info)
+        self.site_name_line_edit = UpperCaseLineEdit()
+        self.site_name_line_edit.focused.connect(self.on_site_id_focus)
+        self.site_name_line_edit.returnPressed.connect(self.fetch_info)
+
+        self.search_button = SearchButton()
+        self.search_button.clicked.connect(self.fetch_info)
 
         self.table_widget = QTableWidget(0, 2)
         self.table_widget.setHorizontalHeaderLabels(["Dados", "Informações"])
@@ -77,13 +82,28 @@ class WindowSiteInfo(QWidget):
 
     def create_form(self):
         form_layout = QFormLayout()
-        form_layout.addRow("End Id ou Ne Name", self.search_widget)
+
+        site_layout = QHBoxLayout()
+        site_layout.addWidget(self.site_name_line_edit)
+        site_layout.addWidget(self.search_button)
+
+        form_layout.addRow("End Id ou Ne Name", site_layout)
         form_layout.addRow(self.table_widget)
 
         self.form_groupbox.setLayout(form_layout)
 
+        form_layout.addRow(self.table_widget)
+
+        self.form_groupbox.setLayout(form_layout)
+
+    def on_site_id_focus(self):
+
+        self.site_name_line_edit.clear()
+        self.table_widget.clearContents()
+        self.table_widget.setRowCount(0)
+
     def fetch_info(self):
-        site_name = self.search_widget.text().strip()
+        site_name = self.site_name_line_edit.text().strip()
 
         if len(site_name) == 7:
             try:
@@ -143,6 +163,8 @@ class WindowSiteInfo(QWidget):
                 "LOCALIDADE": "Localidade",
                 "OWNER RESPONSÁVEL": "Owner Responsável",
                 "Resp. Green": "Resp. Green",
+                "Colaborador": "Layer Plantão",  # novo
+                "Contato": "Contato Plantão",
             }
 
         self.table_widget.setRowCount(len(campos))

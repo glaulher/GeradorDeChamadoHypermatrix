@@ -90,6 +90,15 @@ class WindowMS(QWidget):
     def load_date(self):
         load_combobox_options(self.alarm_type_combobox, "tipo_de_alarme")
 
+    def set_operator_name(self, name: str):
+
+        index = self.operator_combobox.findText(name)
+        if index != -1:
+            self.operator_combobox.setCurrentIndex(index)
+        else:
+            self.operator_combobox.addItem(name)
+            self.operator_combobox.setCurrentText(name)
+
     def on_site_id_focus(self):
         self.success_label.hide()
         self.end_id_line_edit.clear()
@@ -175,7 +184,7 @@ class WindowMS(QWidget):
         payload = {
             "Assunto": "PIM - Report Main Sites",
             "Main Site": f"{end_id} - {building_name} ({regional} / {uf})",
-            "Operador": f"{self.operator_combobox.currentText()}",
+            "Operador": self.operator_combobox.currentText(),
             "Horário": self.hour_widget.text(),
             "Class": classification,
             "Alarme": alarme,
@@ -221,11 +230,10 @@ class WindowMS(QWidget):
 
     def create_form(self):
         layout = QFormLayout()
-        layout.addRow("Operador", self.operator_combobox)
 
         layout.addRow("Horário", self.hour_widget)
 
-        layout.addRow("End_id", self.end_id_line_edit)
+        layout.addRow("End id", self.end_id_line_edit)
         layout.addRow("Tipo de Alarme", self.alarm_type_combobox)
         layout.addRow("TSK / EVE", self.tskeve_line_edit)
         layout.addRow("Atualização", self.update_plain_text)

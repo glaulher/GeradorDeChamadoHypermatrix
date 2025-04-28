@@ -44,7 +44,7 @@ QPushButton {
   padding: 4px 8px;
   font-weight: bold;
   letter-spacing: 0.5px;
-  min-width: 120px; 
+  
   min-width: 80px;       
 
 }

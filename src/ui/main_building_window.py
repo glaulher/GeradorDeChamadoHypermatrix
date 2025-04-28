@@ -68,6 +68,15 @@ class WindowMB(QWidget):
         load_combobox_options(self.alarm_type_combobox, "tipo_de_alarme")
         load_combobox_options(self.gmg_monitor_combobox, "gmg_monitorado")
 
+    def set_operator_name(self, name: str):
+
+        index = self.operator_combobox.findText(name)
+        if index != -1:
+            self.operator_combobox.setCurrentIndex(index)
+        else:
+            self.operator_combobox.addItem(name)
+            self.operator_combobox.setCurrentText(name)
+
     def on_ne_name_changed(self, text):
         if len(text.strip()) == 7:
             self.change_alarm_type()
@@ -200,11 +209,10 @@ class WindowMB(QWidget):
 
     def create_form(self):
         layout = QFormLayout()
-        layout.addRow("Operador", self.operator_combobox)
 
         layout.addRow("Horário", self.hour_widget)
 
-        layout.addRow("NE_NAME", self.ne_name_line_edit)
+        layout.addRow("Ne Name", self.ne_name_line_edit)
         layout.addRow("Tipo de Alarme", self.alarm_type_combobox)
         layout.addRow("Volume de Diesel (litros)", self.volume_diesel_line_edit)
         layout.addRow("Autonomia (horas)", self.autonomy_line_edit)

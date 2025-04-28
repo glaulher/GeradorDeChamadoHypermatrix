@@ -105,6 +105,15 @@ class WindowControlPIM(QWidget):
         load_combobox_options(self.unavailability_combobox, "desservico")
         load_combobox_options(self.ownertim_triggered_combobox, "ownertim_acionado")
 
+    def set_operator_name(self, name: str):
+
+        index = self.operator_combobox.findText(name)
+        if index != -1:
+            self.operator_combobox.setCurrentIndex(index)
+        else:
+            self.operator_combobox.addItem(name)
+            self.operator_combobox.setCurrentText(name)
+
     def on_site_id_focus(self):
         self.success_label.hide()
         self.site_id_line_edit.clear()
@@ -229,7 +238,7 @@ class WindowControlPIM(QWidget):
 
     def create_form(self):
         layout = QFormLayout()
-        layout.addRow("Operador", self.operator_combobox)
+
         layout.addRow("End Id ou Ne Name", self.site_id_line_edit)
         layout.addRow("Tipo de Evento", self.alarm_type_combobox)
         layout.addRow("Alarmou no NetCool", self.netcool_combobox)

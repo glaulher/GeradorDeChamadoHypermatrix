@@ -19,6 +19,7 @@ from ui.widgets.operator_combobox import OperatorComboBox
 from ui.widgets.spell_check_plain_text_edit import SpellCheckPlainTextEdit
 from ui.widgets.uppercase_line_edit import UpperCaseLineEdit
 from utils.datetime_utils import get_greeting
+from utils.operator_config import load_operator_name
 from utils.payload_utils import payload_and_output
 
 
@@ -57,10 +58,22 @@ class WindowDSOC(QWidget):
         # Lazy load
         QTimer.singleShot(0, self.load_date)
 
+    def set_operator_name(self, name: str):
+
+        index = self.operator_combobox.findText(name)
+        if index != -1:
+            self.operator_combobox.setCurrentIndex(index)
+        else:
+            self.operator_combobox.addItem(name)
+            self.operator_combobox.setCurrentText(name)
+
     def load_date(self):
         load_combobox_options(self.motivation_combobox, "motivacao")
         load_combobox_options(self.alarm_type_combobox, "tipo_de_alarme")
         load_combobox_options(self.gravity_combobox, "gravidade")
+        saved_operator = load_operator_name()
+        if saved_operator:
+            self.operator_combobox.setCurrentText(saved_operator)
 
     def on_site_id_focus(self):
         self.success_label.hide()
@@ -128,13 +141,12 @@ class WindowDSOC(QWidget):
 
     def create_form(self):
         layout = QFormLayout()
-        layout.addRow("Operador", self.operator_combobox)
 
         layout.addRow("Horário", self.hour_widget)
 
         layout.addRow("Motivação", self.motivation_combobox)
         layout.addRow("Tipo de Alarme", self.alarm_type_combobox)
         layout.addRow("Gravidade", self.gravity_combobox)
-        layout.addRow("NE_NAME", self.ne_name_line_edit)
+        layout.addRow("Ne Name", self.ne_name_line_edit)
         layout.addRow("Causa", self.update_plain_text)
         self.form_groupbox.setLayout(layout)

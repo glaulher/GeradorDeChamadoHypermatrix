@@ -1,5 +1,6 @@
 from functools import partial
 
+from PySide6.QtCore import Signal
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QButtonGroup,
@@ -17,12 +18,16 @@ from ui.control_pim_window import WindowControlPIM
 from ui.dsoc_window import WindowDSOC
 from ui.main_building_window import WindowMB
 from ui.main_sites_window import WindowMS
+from ui.widgets.operator_combobox import OperatorComboBox
 from ui.window_site_info import WindowSiteInfo
+from utils.operator_config import load_operator_name, save_operator_name
 from utils.resource import internal_path
 from utils.theme_config import apply_theme, load_theme_name
 
 
 class MainWindow(QMainWindow):
+    operator_changed = Signal(str)
+
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Gerador de Chamados")
@@ -40,16 +45,43 @@ class MainWindow(QMainWindow):
 
         # Stacked content
         self.stack = QStackedWidget()
+
+        self.window_control_pim = WindowControlPIM()
+        self.window_dsoc = WindowDSOC()
+        self.window_mb = WindowMB()
+        self.window_ms = WindowMS()
+        self.window_site_info = WindowSiteInfo()
+
         self.pages = [
-            WindowControlPIM(),
-            WindowDSOC(),
-            WindowMB(),
-            WindowMS(),
-            WindowSiteInfo(),
+            self.window_control_pim,
+            self.window_dsoc,
+            self.window_mb,
+            self.window_ms,
+            self.window_site_info,
         ]
 
         for page in self.pages:
             self.stack.addWidget(page)
+
+        self.operator_label = QLabel("Analista:")
+        self.operator_label.setObjectName("sidebarLabel")
+        self.sidebar_layout.addWidget(self.operator_label)
+
+        self.operator_selector = OperatorComboBox()
+
+        saved_operator = load_operator_name()
+        if saved_operator:
+            self.operator_selector.setCurrentText(saved_operator)
+
+        self.operator_widget = QWidget()
+        operator_layout = QVBoxLayout(self.operator_widget)
+        operator_layout.setContentsMargins(0, 0, 0, 10)  # left, top, right, bottom
+        operator_layout.setSpacing(5)
+
+        operator_layout.addWidget(self.operator_label)
+        operator_layout.addWidget(self.operator_selector)
+
+        self.sidebar_layout.addWidget(self.operator_widget)
 
         # Sidebar buttons
         self.button_group = QButtonGroup()
@@ -98,9 +130,28 @@ class MainWindow(QMainWindow):
         # Active first page
         self.set_active(0)
 
+        self.operator_selector.currentIndexChanged.connect(self.save_current_operator)
+        self.operator_selector.editTextChanged.connect(self.save_current_operator)
+
+        self.operator_changed.connect(self.window_control_pim.set_operator_name)
+        self.operator_changed.connect(self.window_dsoc.set_operator_name)
+        self.operator_changed.connect(self.window_mb.set_operator_name)
+        self.operator_changed.connect(self.window_ms.set_operator_name)
+
     def set_active(self, index):
         self.sidebar_buttons[index].setChecked(True)
         self.stack.setCurrentIndex(index)
 
     def change_theme(self, theme_name):
         apply_theme(self, theme_name)
+
+    def save_current_operator(self, _=None):
+        operator_name = self.operator_selector.currentText()
+        if operator_name.strip() != "":
+            save_operator_name(operator_name)
+            self.operator_changed.emit(operator_name)
+
+    def reload_operator_name(self):
+        saved_operator = load_operator_name()
+        if saved_operator:
+            self.operator_selector.setCurrentText(saved_operator)

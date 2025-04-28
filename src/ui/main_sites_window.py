@@ -32,11 +32,11 @@ class WindowMS(QWidget):
         self.operator_combobox = OperatorComboBox()
         self.hour_widget = HourWidget()
 
-        self.end_id_line_edit = UpperCaseLineEdit()
+        self.end_id_line_edit = UpperCaseLineEdit(clear_on_click=True)
         self.end_id_line_edit.focused.connect(self.on_site_id_focus)
 
         self.alarm_type_combobox = QComboBox()
-        self.tskeve_line_edit = UpperCaseLineEdit()
+        self.tskeve_line_edit = UpperCaseLineEdit(clear_on_click=False)
         self.update_plain_text = SpellCheckPlainTextEdit()
 
         # extra fields to be filled in manually in case of not finding the end id
@@ -133,6 +133,14 @@ class WindowMS(QWidget):
         self.hypermatrix_label.setText(
             "⚠️ Utilize as informações cadastradas no Hypermatrix"
         )
+
+        self.regional_line_edit.clear()
+        self.uf_line_edit.clear()
+        self.classification_line_edit.clear()
+        self.building_name_line_edit.clear()
+        self.type_line_edit.clear()
+        self.shelter_type_line_edit.clear()
+        self.area_owner_line_edit.clear()
 
     def _show_fields(self):
         self._set_fields_visibility(True)

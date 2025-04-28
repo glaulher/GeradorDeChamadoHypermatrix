@@ -1,14 +1,14 @@
 {
-    "Assunto": "Prezados! Solicitamos a abertura de chamado para o prédio industrial abaixo:",
-    "Operador": "Anderson Guimarães",
-    "Horário": "27-04-2025 21:50:25",
-    "Motivação": "IB",
-    "Alarme": "Node Offline",
-    "Gravidade": "Severa",
-    "Nome do prédio": "JUAZEIRO DO NORTE I",
-    "NE_NAME": "PIJNE01",
-    "END_ID": "CEJNE_0007",
-    "Regional": "TNE",
-    "UF": "CE",
-    "Causa": "testando"
+    "Assunto": "PIM - Report Main Buildings",
+    "Prédio Industrial": "IB  - JUAZEIRO DO NORTE I | PIJNE01 - CEJNE_0007 (TNE/CE)",
+    "Operador": "Glaulher Medeiros",
+    "Horário": "28-04-2025 15:19:56",
+    "Class": "IB",
+    "Alarme": "Alta Temperatura",
+    "Tipo": "PRÉDIO",
+    "Tipo de abrigo": "None",
+    "Mantenedora": "GREEN 4T",
+    "Tipo de atendimento": "Horário comercial (8x5) + Plantão",
+    "TSK/EVE": "",
+    "Atualização": ""
 }

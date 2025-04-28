@@ -36,7 +36,7 @@ class WindowDSOC(QWidget):
         self.motivation_combobox = QComboBox()
         self.alarm_type_combobox = QComboBox()
         self.gravity_combobox = QComboBox()
-        self.ne_name_line_edit = UpperCaseLineEdit()
+        self.ne_name_line_edit = UpperCaseLineEdit(clear_on_click=True)
         self.ne_name_line_edit.focused.connect(self.on_site_id_focus)
 
         self.update_plain_text = SpellCheckPlainTextEdit()

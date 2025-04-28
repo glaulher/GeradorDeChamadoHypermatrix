@@ -25,6 +25,14 @@ from utils.payload_utils import payload_and_output
 
 
 class WindowMB(QWidget):
+
+    GMG_ALARMS = {
+        "Falha de Energia AC",
+        "GMG - Operação",
+        "GMG - Defeito",
+        "GMG - Nível baixo de combustível",
+    }
+
     def __init__(self):
         super(WindowMB, self).__init__()
         self.setWindowTitle("Gerador de chamados MAIN BUILDING")
@@ -34,16 +42,25 @@ class WindowMB(QWidget):
         self.operator_combobox = OperatorComboBox()
         self.hour_widget = HourWidget()
 
-        self.ne_name_line_edit = UpperCaseLineEdit()
+        self.ne_name_line_edit = UpperCaseLineEdit(clear_on_click=True)
         self.ne_name_line_edit.focused.connect(self.on_site_id_focus)
 
         self.alarm_type_combobox = QComboBox()
         self.alarm_type_combobox.currentIndexChanged.connect(self.change_alarm_type)
+        self.tskeve_line_edit = UpperCaseLineEdit(clear_on_click=False)
+        self.update_plain_text = SpellCheckPlainTextEdit()
+
+        # extra fields
         self.volume_diesel_line_edit = QLineEdit()
         self.autonomy_line_edit = QLineEdit()
         self.gmg_monitor_combobox = QComboBox()
-        self.tskeve_line_edit = UpperCaseLineEdit()
-        self.update_plain_text = SpellCheckPlainTextEdit()
+        self.label_volume = QLabel("Volume de Diesel (litros)")
+        self.label_autonomy = QLabel("Autonomia (horas)")
+        self.label_monitor = QLabel("GMG Monitorado")
+
+        self._setup_extra_fields()
+        self._hide_fields()
+        self.alarm_type_entry = False
 
         self.ne_name_line_edit.textChanged.connect(self.on_ne_name_changed)
 
@@ -63,6 +80,80 @@ class WindowMB(QWidget):
 
         # Lazy load
         QTimer.singleShot(0, self.load_date)
+
+        self.last_searched_ne_name = ""
+
+    def _setup_extra_fields(self):
+        self._extra_fields = [
+            self.volume_diesel_line_edit,
+            self.autonomy_line_edit,
+            self.gmg_monitor_combobox,
+            self.label_volume,
+            self.label_autonomy,
+            self.label_monitor,
+        ]
+
+    def _set_fields_visibility(self, visible: bool):
+        for widget in self._extra_fields:
+            widget.setVisible(visible)
+        self.alarm_type_entry = visible
+
+    def _hide_fields(self):
+        self._set_fields_visibility(False)
+        self.alarm_type_entry = False
+
+        self.volume_diesel_line_edit.clear()
+        self.autonomy_line_edit.clear()
+        self.gmg_monitor_combobox.clear()
+
+    def _show_fields(self):
+        self._set_fields_visibility(True)
+
+    def _lock_fields(self):
+        self.volume_diesel_line_edit.setReadOnly(True)
+        self.autonomy_line_edit.setReadOnly(True)
+        self.gmg_monitor_combobox.setEnabled(False)
+
+    def _unlock_fields(self):
+        self.volume_diesel_line_edit.setReadOnly(False)
+        self.autonomy_line_edit.setReadOnly(False)
+        self.gmg_monitor_combobox.setEnabled(True)
+
+    def change_alarm_type(self):
+
+        alarme = self.alarm_type_combobox.currentText()
+
+        is_gmg = alarme in self.GMG_ALARMS
+
+        if is_gmg:
+            self._show_fields()
+
+            ne_name = self.ne_name_line_edit.text().strip().upper()
+
+            if not ne_name:
+                self._hide_fields()
+                QMessageBox.information(
+                    self,
+                    "Informação",
+                    "Informe o NE Name antes de selecionar o tipo de alarme.",
+                )
+                return
+            if ne_name != self.last_searched_ne_name:
+                try:
+                    diesel_data = get_diesel_data(ne_name)
+                    self.volume_diesel_line_edit.setText(str(diesel_data["litros"]))
+                    self.autonomy_line_edit.setText(str(diesel_data["horas"]))
+                    self.last_searched_ne_name = ne_name
+                    self._lock_fields()
+                except DieselDataError as e:
+                    QMessageBox.warning(
+                        self, "Aviso", f"{str(e)}\nPreencha os dados manualmente."
+                    )
+                    self.volume_diesel_line_edit.setText("N/D")
+                    self.autonomy_line_edit.setText("N/D")
+                    self._unlock_fields()
+        else:
+            self._hide_fields()
 
     def load_date(self):
         load_combobox_options(self.alarm_type_combobox, "tipo_de_alarme")
@@ -84,6 +175,7 @@ class WindowMB(QWidget):
     def on_site_id_focus(self):
         self.success_label.hide()
         self.ne_name_line_edit.clear()
+        self._hide_fields()
 
     def get_info(self):
         ne_name = self.ne_name_line_edit.text().strip().upper()
@@ -110,16 +202,10 @@ class WindowMB(QWidget):
         payload["Class"] = str(fetch_datalookup("END_ID", end_id, "SUBCLASS"))
         payload["Alarme"] = f"{self.alarm_type_combobox.currentText()}"
 
-        if alarme in [
-            "Falha de Energia AC",
-            "GMG - Operação",
-            "GMG - Defeito",
-            "GMG - Nível baixo de combustível",
-        ]:
+        if self.alarm_type_entry:
             payload["Volume de Diesel (litros)"] = (
                 f"{ self.volume_diesel_line_edit.text()}"
             )
-
             payload["Autonomia (horas)"] = f"{self.autonomy_line_edit.text()}"
             payload["GMG Monitorado"] = f"{self.gmg_monitor_combobox.currentText()}"
 
@@ -167,46 +253,6 @@ class WindowMB(QWidget):
             self.success_label.setText("✅ Texto copiado!")
             self.success_label.show()
 
-    def change_alarm_type(self):
-
-        alarme = self.alarm_type_combobox.currentText()
-
-        is_gmg = alarme in [
-            "Falha de Energia AC",
-            "GMG - Operação",
-            "GMG - Defeito",
-            "GMG - Nível baixo de combustível",
-        ]
-
-        self.volume_diesel_line_edit.setEnabled(is_gmg)
-        self.autonomy_line_edit.setEnabled(is_gmg)
-        self.gmg_monitor_combobox.setEnabled(is_gmg)
-
-        if is_gmg:
-            ne_name = self.ne_name_line_edit.text().strip().upper()
-
-            if not ne_name:
-                QMessageBox.information(
-                    self,
-                    "Informação",
-                    "Informe o NE Name antes de selecionar o tipo de alarme.",
-                )
-                return
-
-            try:
-                diesel_data = get_diesel_data(ne_name)
-                self.volume_diesel_line_edit.setText(str(diesel_data["litros"]))
-                self.autonomy_line_edit.setText(str(diesel_data["horas"]))
-            except DieselDataError as e:
-                QMessageBox.warning(
-                    self, "Aviso", f"{str(e)}\nPreencha os dados manualmente."
-                )
-                self.volume_diesel_line_edit.setText("N/D")
-                self.autonomy_line_edit.setText("N/D")
-        else:
-            self.volume_diesel_line_edit.setText("")
-            self.autonomy_line_edit.setText("")
-
     def create_form(self):
         layout = QFormLayout()
 
@@ -214,9 +260,9 @@ class WindowMB(QWidget):
 
         layout.addRow("Ne Name", self.ne_name_line_edit)
         layout.addRow("Tipo de Alarme", self.alarm_type_combobox)
-        layout.addRow("Volume de Diesel (litros)", self.volume_diesel_line_edit)
-        layout.addRow("Autonomia (horas)", self.autonomy_line_edit)
-        layout.addRow("GMG Monitorado", self.gmg_monitor_combobox)
+        layout.addRow(self.label_volume, self.volume_diesel_line_edit)
+        layout.addRow(self.label_autonomy, self.autonomy_line_edit)
+        layout.addRow(self.label_monitor, self.gmg_monitor_combobox)
         layout.addRow("TSK / EVE", self.tskeve_line_edit)
         layout.addRow("Atualização", self.update_plain_text)
         self.form_groupbox.setLayout(layout)

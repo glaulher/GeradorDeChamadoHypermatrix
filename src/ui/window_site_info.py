@@ -161,15 +161,20 @@ class WindowSiteInfo(QWidget):
                 "MANTENEDORA": "Mantenedora",
                 "ATENDIMENTO": "Atendimento",
                 "LOCALIDADE": "Localidade",
-                "OWNER RESPONSÁVEL": "Owner Responsável",
-                "Resp. Green": "Resp. Green",
-                "Colaborador": "Layer Plantão",  # novo
-                "Contato": "Contato Plantão",
+                "Colaborador Tim": "Layer",
+                "Contato Tim": "Contato Layer",
+                "Colaborador Terceira 1": "Mantenedora 1",
+                "Contato Terceira 1": "Contato Mantenedora 1",
+                "Colaborador Terceira 2": "Mantenedora 2",
+                "Contato Terceira 2": "Contato Mantenedora 2",
+                "Colaborador Plantão": "Layer Plantão",
+                "Contato Plantão": "Contato Plantão",
             }
 
-        self.table_widget.setRowCount(len(campos))
+        campos_visiveis = {k: campos.get(k, k) for k in site_info.keys() if k in campos}
+        self.table_widget.setRowCount(len(campos_visiveis))
 
-        for row, (key, format_name) in enumerate(campos.items()):
+        for row, (key, format_name) in enumerate(campos_visiveis.items()):
             item_campo = QTableWidgetItem(format_name)
             valor = site_info.get(key, "")
 

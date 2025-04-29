@@ -34,7 +34,6 @@ def get_main_site_info(end_id: str):
             "UF",
             "Testes Programados GMG",
             "CLASSIFICAÇÃO GSBI",
-            "Owner",
         ]
 
         df_main_site = pd.read_csv(url_main_site, usecols=desired_columns)

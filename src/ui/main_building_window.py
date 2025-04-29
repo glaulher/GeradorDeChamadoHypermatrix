@@ -104,7 +104,6 @@ class WindowMB(QWidget):
 
         self.volume_diesel_line_edit.clear()
         self.autonomy_line_edit.clear()
-        self.gmg_monitor_combobox.clear()
 
     def _show_fields(self):
         self._set_fields_visibility(True)
@@ -112,12 +111,10 @@ class WindowMB(QWidget):
     def _lock_fields(self):
         self.volume_diesel_line_edit.setReadOnly(True)
         self.autonomy_line_edit.setReadOnly(True)
-        self.gmg_monitor_combobox.setEnabled(False)
 
     def _unlock_fields(self):
         self.volume_diesel_line_edit.setReadOnly(False)
         self.autonomy_line_edit.setReadOnly(False)
-        self.gmg_monitor_combobox.setEnabled(True)
 
     def change_alarm_type(self):
 

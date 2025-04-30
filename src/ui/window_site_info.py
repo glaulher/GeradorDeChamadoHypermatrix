@@ -87,7 +87,7 @@ class WindowSiteInfo(QWidget):
         site_layout.addWidget(self.site_name_line_edit)
         site_layout.addWidget(self.search_button)
 
-        form_layout.addRow("End Id ou Ne Name", site_layout)
+        form_layout.addRow("Main Site End Id - Main Building Ne Name", site_layout)
         form_layout.addRow(self.table_widget)
 
         self.form_groupbox.setLayout(form_layout)

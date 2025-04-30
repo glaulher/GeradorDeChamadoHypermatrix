@@ -13,6 +13,10 @@ class BuildingDataError(Exception):
     pass
 
 
+def safe_strip(value):
+    return str(value).strip() if pd.notna(value) else ""
+
+
 def get_main_build_info(ne_name: str):
     try:
         sheet_id = os.getenv("SHEET_ID")
@@ -42,14 +46,15 @@ def get_main_build_info(ne_name: str):
         df_main_building = pd.read_csv(url_main_building, usecols=desired_columns)
 
         building_row = df_main_building[df_main_building["NE_NAME"] == ne_name]
+
         if building_row.empty:
-            raise BuildingDataError(f"NE_NAME '{ne_name}' não encontrado.")
+            raise BuildingDataError(f"NE_NAME ou END_ID '{ne_name}' não encontrado.")
 
         building_info = building_row.iloc[0].to_dict()
 
-        building_region = building_info.get("REGIONAL", "").strip()
-        maintainer = building_info.get("Resp. Green", "").strip()
-        layer = building_info.get("OWNER RESPONSÁVEL", "").strip()
+        building_region = safe_strip(building_info.get("REGIONAL"))
+        maintainer = safe_strip(building_info.get("Resp. Green"))
+        layer = safe_strip(building_info.get("OWNER RESPONSÁVEL"))
 
         try:
             collaborators_on_duty = get_today_on_duty_collaborators()

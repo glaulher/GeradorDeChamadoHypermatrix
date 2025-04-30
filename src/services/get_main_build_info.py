@@ -72,7 +72,7 @@ def get_main_build_info(ne_name: str):
                     building_info["Colaborador Terceira 1"] = name
                     building_info["Contato Terceira 1"] = phone
                     break
-                else:
+                elif enterprise != "Owner Tim":
                     find_maintainer.append((name, phone))
 
             if "Colaborador Terceira 1" not in building_info:

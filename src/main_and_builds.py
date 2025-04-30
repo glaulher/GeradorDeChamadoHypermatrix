@@ -3,7 +3,7 @@ pip install PySide6
 pip install pyinstaller ou pip install nuitka ordered-set zstandard
 pip install pyperclip
 pip install pandas
-python -m pip install requests
+pip install requests
 pip install jinja2
 pip install pylint
 pip install pyspellchecker

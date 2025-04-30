@@ -147,7 +147,12 @@ class WindowSiteInfo(QWidget):
                 "UF": "UF",
                 "Testes Programados GMG": "Testes Programados GMG",
                 "CLASSIFICAÇÃO GSBI": "GSBI",
-                "Owner": "Owner",
+                "Colaborador": "Owner",
+                "Telefone": "Contato Owner",
+                "Horario": "Atendimento Owner",
+                "ColaboradorGerente": "Gerente",
+                "TelefoneGerente": "Contato Gerente",
+                "HorarioGerente": "Atendimento Gerente",
             }
         else:
             campos = {
@@ -183,15 +188,15 @@ class WindowSiteInfo(QWidget):
 
             item_valor = QTableWidgetItem(str(valor))
 
+            if any(word in format_name for word in ["Gerente", "Plantão"]):
+                item_valor.setForeground(QColor("red"))
+
             self.table_widget.setItem(row, 0, item_campo)
             self.table_widget.setItem(row, 1, item_valor)
 
-        for row in range(self.table_widget.rowCount()):
-            item = self.table_widget.item(row, 0)
-            if item:
-                font = item.font()
-                font.setBold(True)
-                item.setFont(font)
-                item.setForeground(QColor(22, 160, 133))
+            font = item_campo.font()
+            font.setBold(True)
+            item_campo.setFont(font)
+            item_campo.setForeground(QColor(22, 160, 133))
 
         self.table_widget.setColumnWidth(0, 220)

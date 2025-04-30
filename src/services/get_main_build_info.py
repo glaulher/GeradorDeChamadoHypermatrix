@@ -35,6 +35,7 @@ def get_main_build_info(ne_name: str):
             "MANTENEDORA",
             "ATENDIMENTO",
             "LOCALIDADE",
+            "OWNER RESPONSÁVEL",
             "Resp. Green",
         ]
 
@@ -48,6 +49,7 @@ def get_main_build_info(ne_name: str):
 
         building_region = building_info.get("REGIONAL", "").strip()
         maintainer = building_info.get("Resp. Green", "").strip()
+        layer = building_info.get("OWNER RESPONSÁVEL", "").strip()
 
         try:
             collaborators_on_duty = get_today_on_duty_collaborators()
@@ -63,7 +65,7 @@ def get_main_build_info(ne_name: str):
                 if building_region not in region:
                     continue
 
-                if enterprise == "Owner Tim":
+                if enterprise == "Owner Tim" and layer == name:
                     building_info["Colaborador Tim"] = name
                     building_info["Contato Tim"] = phone
                 elif name == maintainer:
@@ -142,7 +144,6 @@ def get_today_on_duty_collaborators():
         today_day = datetime.now().day  # número do dia, ex: 27
         today_column = str(today_day)  # nome da coluna, ex: "27"
 
-        # Filtrar linhas onde no dia atual tem "Plantão"
         filtered_df = df_on_duty[df_on_duty[today_column] == "Plantão"]
 
         collaborators = filtered_df[

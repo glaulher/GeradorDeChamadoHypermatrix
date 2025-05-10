@@ -24,6 +24,22 @@ pyinstaller --clean --onefile --noconsole `
 --add-data "../.env;." `
 main_and_builds.py
 
+
+
+
+
+pyinstaller \
+--add-data=data/recipients.json:data \
+--add-data=styles/sidebar.qss:styles \
+--add-data=styles/ui.qss:styles \
+--add-data=styles/light.qss:styles \
+--add-data=styles/dark.qss:styles \
+--add-data=ui/email_chamados.html:ui \
+--add-data=assets/logo_small.ico:assets \
+--add-data=spellchecker/resources/pt.json.gz:spellchecker/resources \
+--add-data=../.env:. \
+main_and_builds.py
+
 """
 
 import sys

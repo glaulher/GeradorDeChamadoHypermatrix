@@ -45,7 +45,7 @@ def apply_theme(parent: QWidget, theme_name: str):
         parent.setStyleSheet("")
         return
 
-    path = internal_path(f"styles/{theme_name}.qss")
+    path = internal_path(f"styles/{theme_name.lower()}.qss")
 
     try:
         with open(path, "r", encoding="utf-8") as f:

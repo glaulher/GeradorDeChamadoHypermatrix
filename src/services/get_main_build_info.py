@@ -73,11 +73,12 @@ def get_main_build_info(ne_name: str):
                 if enterprise == "Owner Tim" and layer == name:
                     building_info["Colaborador Tim"] = name
                     building_info["Contato Tim"] = phone
-                elif name == maintainer:
+                elif enterprise == "Green4T" and name == maintainer:
+
                     building_info["Colaborador Terceira 1"] = name
                     building_info["Contato Terceira 1"] = phone
                     break
-                elif enterprise != "Owner Tim":
+                if enterprise not in {"Owner Tim", "Green4T"}:
                     find_maintainer.append((name, phone))
 
             if "Colaborador Terceira 1" not in building_info:

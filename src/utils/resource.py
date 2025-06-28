@@ -21,6 +21,15 @@ def external_path(relative_path):
 
 
 def load_env_file():
-    dotenv_path = internal_path(".env")
+    if hasattr(sys, "_MEIPASS"):
+        # Running in a PyInstaller bundle
+        base_path = sys._MEIPASS
+    else:
+        # Running in a normal Python environment
+        # Get the path of the current file (resource.py) and go up two levels
+        base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+
+    dotenv_path = os.path.join(base_path, ".env")
+
     if os.path.exists(dotenv_path):
         load_dotenv(dotenv_path)
